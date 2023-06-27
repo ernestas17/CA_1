@@ -89,6 +89,6 @@ export const StyledListWraper = styled.div<INavigationProps>`
     display: flex;
 
     @media (min-width: ${(props) => (props.breakpoint ? props.breakpoint : '1200px')}) {
-        justify-content: center;
+        justify-content: ${(props) => (props.desktopalign ? props.desktopalign : 'center')};
     }
 `;

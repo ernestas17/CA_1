@@ -7,21 +7,22 @@ export interface INavigationProps {
     breakpoint?: string;
     currentUrl?: string | null;
     linkList?: ILinkListItem[];
-    burgeralign?: BURGER_ALIGNMENT;
+    burgeralign?: NAV_ALIGNMENT;
+    desktopalign?: NAV_ALIGNMENT;
 }
 
-export enum BURGER_ALIGNMENT {
+export enum NAV_ALIGNMENT {
     left = 'left',
     center = 'center',
     right = 'right',
 }
 
-const Navigation = ({ breakpoint, currentUrl, linkList, burgeralign }: INavigationProps) => {
+const Navigation = ({ breakpoint, currentUrl, linkList, burgeralign, desktopalign }: INavigationProps) => {
     const [navActive, setNavActive] = useState(false);
 
     return (
         <StyledNav breakpoint={breakpoint}>
-            <StyledListWraper breakpoint={breakpoint} burgeralign={burgeralign}>
+            <StyledListWraper breakpoint={breakpoint} burgeralign={burgeralign} desktopalign={desktopalign}>
                 <i className='fa-solid fa-bars' onClick={() => setNavActive((prev) => !prev)}></i>
 
                 <ul className={navActive ? 'active' : ''}>

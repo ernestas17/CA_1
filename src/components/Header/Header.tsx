@@ -3,7 +3,7 @@ import Navigation from '../Navigation';
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { LINK_LIST } from '../../shared/link_list';
-import { BURGER_ALIGNMENT } from '../Navigation/Navigation';
+import { NAV_ALIGNMENT } from '../Navigation/Navigation';
 
 const Header = () => {
     const location = useLocation();
@@ -16,7 +16,7 @@ const Header = () => {
 
     return (
         <StyledHeader>
-            <Navigation breakpoint={'1024px'} currentUrl={url} linkList={LINK_LIST} burgeralign={BURGER_ALIGNMENT.right} />
+            <Navigation breakpoint={'1024px'} currentUrl={url} linkList={LINK_LIST} burgeralign={NAV_ALIGNMENT.right} />
         </StyledHeader>
     );
 };
