@@ -6,7 +6,7 @@ import AtlyginimoMokesciuSkaiciuokle from "./components/AtlyginimoMokesciuSkaici
 import IndividualiosVeiklosMokesciuSkaiciuokle from "./components/IndividualiosVeiklosMokesciuSkaiciuokle";
 import PvmSkaiciuokle from "./components/PvmSkaiciuokle";
 import ValiutuSkaiciuokle from "./components/ValiutuSkaiciuokle";
-import SumaZodziu from "./components/SumaZodziu";
+import SumaZodziuSkaiciuokle from "./components/SumaZodziuSkaiciuokle";
 
 const App = () => {
   return (
@@ -14,16 +14,19 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Pagrindinis />} />
         <Route
-          path="/atlyginimas"
+          path="/atlyginimo-mokesciu-skaiciuokle"
           element={<AtlyginimoMokesciuSkaiciuokle />}
         />
         <Route
-          path="/individuali-veikla"
+          path="/individualios-veiklos-skaiciuokle"
           element={<IndividualiosVeiklosMokesciuSkaiciuokle />}
         />
-        <Route path="/pvm" element={<PvmSkaiciuokle />} />
-        <Route path="/valiutos" element={<ValiutuSkaiciuokle />} />
-        <Route path="/suma-zodziu" element={<SumaZodziu />} />
+        <Route path="/pvm-skaiciuokle" element={<PvmSkaiciuokle />} />
+        <Route path="/valiutu-skaiciuokle" element={<ValiutuSkaiciuokle />} />
+        <Route
+          path="/suma-zodziu-skaiciuokle"
+          element={<SumaZodziuSkaiciuokle />}
+        />
       </Routes>
     </Router>
   );

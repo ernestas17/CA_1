@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 
-const SumaZodziu = () => {
+const SumaZodziuSkaiciuokle = () => {
   return (
     <main>
       <Outlet />
@@ -8,4 +8,4 @@ const SumaZodziu = () => {
   );
 };
 
-export default SumaZodziu;
+export default SumaZodziuSkaiciuokle;
