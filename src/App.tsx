@@ -1,35 +1,32 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Outlet } from "react-router-dom";
+import Pagrindinis from "./components/Pagrindinis";
+import AtlyginimoMokesciuSkaiciuokle from "./components/AtlyginimoMokesciuSkaiciuokle";
+import IndividualiosVeiklosMokesciuSkaiciuokle from "./components/IndividualiosVeiklosMokesciuSkaiciuokle";
+import PvmSkaiciuokle from "./components/PvmSkaiciuokle";
+import ValiutuSkaiciuokle from "./components/ValiutuSkaiciuokle";
+import SumaZodziu from "./components/SumaZodziu";
 
-function App() {
-  const [count, setCount] = useState(0)
-
+const App = () => {
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <Router>
+      <Routes>
+        <Route path="/" element={<Pagrindinis />} />
+        <Route
+          path="/atlyginimas"
+          element={<AtlyginimoMokesciuSkaiciuokle />}
+        />
+        <Route
+          path="/individuali-veikla"
+          element={<IndividualiosVeiklosMokesciuSkaiciuokle />}
+        />
+        <Route path="/pvm" element={<PvmSkaiciuokle />} />
+        <Route path="/valiutos" element={<ValiutuSkaiciuokle />} />
+        <Route path="/suma-zodziu" element={<SumaZodziu />} />
+      </Routes>
+    </Router>
+  );
+};
 
-export default App
+export default App;
