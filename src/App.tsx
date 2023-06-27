@@ -1,4 +1,5 @@
 import Input from './components/atoms/Input';
+import styled from 'styled-components';
 
 import './App.css';
 
