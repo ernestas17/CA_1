@@ -1,11 +1,12 @@
-import { Outlet } from "react-router-dom";
+import { Outlet } from 'react-router-dom';
 
 const AtlyginimoMokesciuSkaiciuokle = () => {
-  return (
-    <main>
-      <Outlet />
-    </main>
-  );
+    return (
+        <main>
+            <Outlet />
+            <h2>atlyginimoo mokesciu skaiciuokle</h2>
+        </main>
+    );
 };
 
 export default AtlyginimoMokesciuSkaiciuokle;
