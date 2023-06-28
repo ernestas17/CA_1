@@ -4,6 +4,11 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { LINK_LIST } from '../../shared/link_list';
 import { NAV_ALIGNMENT } from '../Navigation/Navigation';
+import { colorThemes } from '../../shared/color_themes';
+
+export interface IHeaderProps {
+    breakpoint: string;
+}
 
 const Header = () => {
     const location = useLocation();
@@ -14,9 +19,19 @@ const Header = () => {
         setUrl(pathname);
     }, [location, pathname]);
 
+    const breakpoint = '1200px';
+    const theme = colorThemes.purple;
+
     return (
-        <StyledHeader>
-            <Navigation breakpoint={'1024px'} currentUrl={url} linkList={LINK_LIST} burgeralign={NAV_ALIGNMENT.right} />
+        <StyledHeader breakpoint={breakpoint} theme={theme}>
+            <Navigation
+                theme={theme}
+                breakpoint={breakpoint}
+                currentUrl={url}
+                linkList={LINK_LIST}
+                burgeralign={NAV_ALIGNMENT.right}
+                desktopalign={NAV_ALIGNMENT.center}
+            />
         </StyledHeader>
     );
 };
