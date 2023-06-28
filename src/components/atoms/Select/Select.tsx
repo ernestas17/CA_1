@@ -9,7 +9,6 @@ const Select = () => {
   const [options, setOptions] = useState<IOptionProps[]>([]);
   const [selectedValue, setSelectedValue] = useState<string>('');
 
-  // Function to handle selection changes
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value;
     setSelectedValue(value);
