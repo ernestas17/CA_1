@@ -2,7 +2,6 @@ import { StyledInputWrapper, StyledInput } from './style';
 
 interface IInputProps {
   type: 'number' | 'checkbox' | 'date' | 'radio';
-  value?: number;
 }
 
 const Input = ({ type }: IInputProps) => {
