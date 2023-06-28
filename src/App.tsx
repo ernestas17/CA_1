@@ -7,12 +7,10 @@ import IndividualiosVeiklosMokesciuSkaiciuokle from './components/IndividualiosV
 import PvmSkaiciuokle from './components/PvmSkaiciuokle';
 import ValiutuSkaiciuokle from './components/ValiutuSkaiciuokle';
 import SumaZodziuSkaiciuokle from './components/SumaZodziuSkaiciuokle';
-import Input from './components/atoms/Input';
 
 const App = () => {
   return (
     <>
-      <Input type={'checkbox'} />
       <Router>
         <Routes>
           <Route path='/' element={<Pagrindinis />} />
