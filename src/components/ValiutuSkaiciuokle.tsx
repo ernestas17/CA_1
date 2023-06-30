@@ -3,12 +3,16 @@ import currency_api from '../shared/api/currency_api';
 import {
     StyledAddNewCurrencyContainer,
     StyledAddNewCurrencyWrapper,
+    StyledCurrencyOutputContainer,
+    StyledCurrencyOutputInfoWrapper,
+    StyledCurrencyOutputList,
     StyledDivider,
     StyledMain,
     StyledSection,
     StyledSectionContent,
     StyledSectionHeadingWrapper,
     StyledSelectedCurrencyWrapper,
+    StyledSingleOutputWrapper,
     StyledWrapper,
     StyledYearSelectWrapper,
 } from './Pages/styles';
@@ -24,6 +28,8 @@ export interface ICurrency {
 }
 
 import { IPageProps } from './Pages/types';
+import Input from './atoms/Input';
+import Select from './atoms/Select';
 
 export interface ICurrencyObject {
     [key: string]: ICurrency;
@@ -124,14 +130,13 @@ const ValiutuSkaiciuokle = ({ headingText, theme, layoutbreakpoint }: IPageProps
                 <StyledSectionContent theme={theme}>
                     <StyledYearSelectWrapper>
                         <label htmlFor='date-select'>Valiutos kurso data: </label>
-                        <input
-                            id='date-select'
-                            value={currentDate}
+                        <Input
+                            type='date'
+                            identifier='date-select'
+                            changeEvent={(e) => setCurrentDate(e.target.value)}
                             min={minDate}
                             max={today}
-                            onChange={(e) => setCurrentDate(e.target.value)}
-                            type='date'
-                            name='date-select'
+                            value={currentDate}
                         />
                     </StyledYearSelectWrapper>
 
@@ -141,7 +146,8 @@ const ValiutuSkaiciuokle = ({ headingText, theme, layoutbreakpoint }: IPageProps
                         <StyledSelectedCurrencyWrapper>
                             <div>
                                 <label htmlFor='selected-currency'>Pasirinkta valiuta</label>
-                                <select onChange={(e) => currencyChangeHandler(e)} name='selected-currency' id='selected-currency'>
+
+                                <Select theme={theme} changeEvent={(e) => currencyChangeHandler(e)} identifier='selected-currency'>
                                     {availableCurrencies &&
                                         Object.keys(availableCurrencies).map((currency) => {
                                             const currentCurrency = availableCurrencies[currency];
@@ -152,19 +158,18 @@ const ValiutuSkaiciuokle = ({ headingText, theme, layoutbreakpoint }: IPageProps
                                                 </option>
                                             );
                                         })}
-                                </select>
+                                </Select>
                             </div>
 
                             <div>
                                 <label htmlFor='currency-input'>Suma</label>
-                                <input
-                                    ref={currencyInputRef}
-                                    onChange={(e) => updateOutputValues(e.target)}
-                                    className='currency-input'
-                                    id='currency-input'
-                                    name='currency-input'
+
+                                <Input
                                     type='text'
-                                    data-currency={currencyCode}
+                                    changeEvent={(e) => updateOutputValues(e?.target)}
+                                    identifier='currency-input'
+                                    innerRef={currencyInputRef}
+                                    data={{ 'data-currency': currencyCode }}
                                 />
                             </div>
                         </StyledSelectedCurrencyWrapper>
@@ -173,7 +178,11 @@ const ValiutuSkaiciuokle = ({ headingText, theme, layoutbreakpoint }: IPageProps
                             <StyledAddNewCurrencyWrapper>
                                 <div>
                                     <label htmlFor='currencies'>Pridėti valiutą</label>
-                                    <select onChange={addNewCurrency} name='currencies' id='currencies'>
+
+                                    <Select theme={theme} changeEvent={addNewCurrency} identifier='currencies'>
+                                        <option disabled selected key='pasirinkite' value='pasirinkite'>
+                                            - Pasirinkite -
+                                        </option>
                                         {availableCurrencies &&
                                             Object.keys(availableCurrencies).map((currency) => {
                                                 const currentCurrency = availableCurrencies[currency];
@@ -186,16 +195,17 @@ const ValiutuSkaiciuokle = ({ headingText, theme, layoutbreakpoint }: IPageProps
                                                     );
                                                 }
                                             })}
-                                    </select>
+                                    </Select>
                                 </div>
 
                                 <div>
                                     <label>Skaičiai po kablelio</label>
-                                    <select
-                                        onChange={(e) => setDecimalNumbers(() => parseInt((e.target as HTMLSelectElement).value))}
-                                        name='decimal-numbers'
-                                        id='decimal-numbers'
-                                        defaultValue={2}
+
+                                    <Select
+                                        value={2}
+                                        theme={theme}
+                                        changeEvent={(e) => setDecimalNumbers(() => parseInt((e.target as HTMLSelectElement).value))}
+                                        identifier='decimal-numbers'
                                     >
                                         {[0, 1, 2, 3, 4, 5].map((num) => {
                                             return (
@@ -204,42 +214,37 @@ const ValiutuSkaiciuokle = ({ headingText, theme, layoutbreakpoint }: IPageProps
                                                 </option>
                                             );
                                         })}
-                                    </select>
+                                    </Select>
                                 </div>
                             </StyledAddNewCurrencyWrapper>
 
-                            <div className='currency-output-list'>
+                            <StyledCurrencyOutputList>
                                 {currencyInputList.map((currency) => {
                                     if (currencyCode !== currency) {
                                         return (
-                                            <div
-                                                style={{ display: 'flex', gap: '5px', alignItems: 'center' }}
-                                                key={currency + '-' + 'input-wrapper'}
-                                                className='currency-output-wrapper'
-                                            >
-                                                <i
-                                                    onClick={(e) => removeCurrencyInput(e)}
-                                                    data-currency={currency}
-                                                    className='fa-solid fa-xmark currency-remove'
-                                                ></i>
-                                                <input
-                                                    onChange={(e) => updateOutputValues(e.target)}
-                                                    className='currency-output'
-                                                    type='text'
-                                                    data-currency={currency}
-                                                />
-                                                <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }} className='currency-info-wrapper'>
-                                                    <span className='currency-code'>{currency}</span>
+                                            <StyledSingleOutputWrapper key={currency + '-' + 'input-wrapper'} className='currency-output-wrapper'>
+                                                <StyledCurrencyOutputInfoWrapper className='currency-info-wrapper'>
                                                     <img
                                                         src={`https://wise.com/public-resources/assets/flags/rectangle/${currency.toLowerCase()}.png`}
                                                         alt='currency flag'
                                                     />
-                                                </div>
-                                            </div>
+                                                    <span className='currency-code'>{currency}</span>
+                                                </StyledCurrencyOutputInfoWrapper>
+
+                                                <StyledCurrencyOutputContainer theme={theme}>
+                                                    <Input type='text' disabled identifier='currency-output' data={{ 'data-currency': currency }} />
+
+                                                    <i
+                                                        onClick={(e) => removeCurrencyInput(e)}
+                                                        data-currency={currency}
+                                                        className='fa-solid fa-xmark currency-remove'
+                                                    ></i>
+                                                </StyledCurrencyOutputContainer>
+                                            </StyledSingleOutputWrapper>
                                         );
                                     }
                                 })}
-                            </div>
+                            </StyledCurrencyOutputList>
                         </StyledAddNewCurrencyContainer>
                     </StyledWrapper>
                 </StyledSectionContent>
