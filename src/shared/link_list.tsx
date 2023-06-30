@@ -4,6 +4,7 @@ import Pagrindinis from '../components/Pagrindinis';
 import PvmSkaiciuokle from '../components/PvmSkaiciuokle';
 import SumaZodziuSkaiciuokle from '../components/SumaZodziuSkaiciuokle';
 import ValiutuSkaiciuokle from '../components/ValiutuSkaiciuokle';
+import { currentTheme } from './color_themes';
 
 export interface ILinkListItem {
     name: string;
@@ -12,6 +13,8 @@ export interface ILinkListItem {
     isIndex?: boolean;
     element: JSX.Element;
 }
+
+const layoutHeightBreakpoint = '768px';
 
 export const LINK_LIST: ILinkListItem[] = [
     {
@@ -25,30 +28,42 @@ export const LINK_LIST: ILinkListItem[] = [
         name: 'Atlyginimo ir mokesčių skaičiuoklė',
         url: '/atlyginimo-mokesciu-skaiciuokle',
         key: 2,
-        element: <AtlyginimoMokesciuSkaiciuokle />,
+        element: (
+            <AtlyginimoMokesciuSkaiciuokle
+                headingText='Atlyginimo ir mokesčių skaičiuoklė'
+                theme={currentTheme}
+                layoutbreakpoint={layoutHeightBreakpoint}
+            />
+        ),
     },
     {
         name: 'Individualios veiklos mokesčių skaičiuoklė',
         url: '/individualios-veiklos-skaiciuokle',
         key: 3,
-        element: <IndividualiosVeiklosMokesciuSkaiciuokle />,
+        element: (
+            <IndividualiosVeiklosMokesciuSkaiciuokle
+                headingText='Individualios veiklos mokesčių skaičiuoklė'
+                theme={currentTheme}
+                layoutbreakpoint={layoutHeightBreakpoint}
+            />
+        ),
     },
     {
         name: 'PVM skaičiuoklė',
         url: '/pvm-skaiciuokle',
         key: 4,
-        element: <PvmSkaiciuokle />,
+        element: <PvmSkaiciuokle headingText='PVM skaičiuoklė' theme={currentTheme} layoutbreakpoint={layoutHeightBreakpoint} />,
     },
     {
         name: 'Valiutų skaičiuoklė',
         url: '/valiutu-skaiciuokle',
         key: 5,
-        element: <ValiutuSkaiciuokle />,
+        element: <ValiutuSkaiciuokle headingText='Valiutų skaičiuoklė' theme={currentTheme} layoutbreakpoint={layoutHeightBreakpoint} />,
     },
     {
         name: 'Suma žodžiais',
         url: '/suma-zodziu-skaiciuokle',
         key: 6,
-        element: <SumaZodziuSkaiciuokle />,
+        element: <SumaZodziuSkaiciuokle headingText='Suma žodžiais' theme={currentTheme} layoutbreakpoint={layoutHeightBreakpoint} />,
     },
 ];

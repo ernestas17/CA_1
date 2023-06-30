@@ -1,11 +1,17 @@
-import { Outlet } from 'react-router-dom';
+import { StyledMain, StyledSection, StyledSectionHeadingWrapper, StyledSectionContent } from './Pages/styles';
+import { IPageProps } from './Pages/types';
 
-const IndividualiosVeiklosMokesciuSkaiciuokle = () => {
+const IndividualiosVeiklosMokesciuSkaiciuokle = ({ headingText, theme }: IPageProps) => {
     return (
-        <main>
-            <Outlet />
-            <h2>individuolios veiklos skaiciuokle</h2>
-        </main>
+        <StyledMain>
+            <StyledSection>
+                <StyledSectionHeadingWrapper theme={theme}>
+                    <h3>{headingText}</h3>
+                </StyledSectionHeadingWrapper>
+
+                <StyledSectionContent theme={theme}></StyledSectionContent>
+            </StyledSection>
+        </StyledMain>
     );
 };
 

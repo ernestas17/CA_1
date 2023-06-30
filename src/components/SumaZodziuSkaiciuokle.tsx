@@ -1,11 +1,17 @@
-import { Outlet } from 'react-router-dom';
+import { StyledMain, StyledSection, StyledSectionHeadingWrapper, StyledSectionContent } from './Pages/styles';
+import { IPageProps } from './Pages/types';
 
-const SumaZodziuSkaiciuokle = () => {
+const SumaZodziuSkaiciuokle = ({ headingText, theme }: IPageProps) => {
     return (
-        <main>
-            <Outlet />
-            <h2>Suma zodziais</h2>
-        </main>
+        <StyledMain>
+            <StyledSection>
+                <StyledSectionHeadingWrapper theme={theme}>
+                    <h3>{headingText}</h3>
+                </StyledSectionHeadingWrapper>
+
+                <StyledSectionContent theme={theme}></StyledSectionContent>
+            </StyledSection>
+        </StyledMain>
     );
 };
 
