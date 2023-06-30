@@ -1,15 +1,14 @@
+import { useState, ChangeEvent, useEffect } from 'react';
 import { StyledInputWrapper, StyledInput } from './style';
 
+type InputType = 'number' | 'checkbox' | 'date' | 'radio';
+
 interface IInputProps {
-  type: 'number' | 'checkbox' | 'date' | 'radio';
+  type: InputType;
+  value: any;
+  onChange: (value: any) => void;
 }
 
-const Input = ({ type }: IInputProps) => {
-  return (
-    <StyledInputWrapper>
-      <StyledInput type={type} />
-    </StyledInputWrapper>
-  );
-};
+const Input = () => {};
 
 export default Input;
