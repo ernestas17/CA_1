@@ -68,3 +68,5 @@ export const colorThemes = {
         color: '#0a0a0a',
     },
 };
+
+export const currentTheme = colorThemes.purple;

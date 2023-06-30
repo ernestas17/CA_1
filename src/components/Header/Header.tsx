@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { LINK_LIST } from '../../shared/link_list';
 import { NAV_ALIGNMENT } from '../Navigation/Navigation';
-import { colorThemes } from '../../shared/color_themes';
+import { currentTheme } from '../../shared/color_themes';
 
 export interface IHeaderProps {
     breakpoint: string;
@@ -20,12 +20,11 @@ const Header = () => {
     }, [location, pathname]);
 
     const breakpoint = '1200px';
-    const theme = colorThemes.purple;
 
     return (
-        <StyledHeader breakpoint={breakpoint} theme={theme}>
+        <StyledHeader breakpoint={breakpoint} theme={currentTheme}>
             <Navigation
-                theme={theme}
+                theme={currentTheme}
                 breakpoint={breakpoint}
                 currentUrl={url}
                 linkList={LINK_LIST}

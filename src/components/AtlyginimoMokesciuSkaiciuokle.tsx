@@ -1,11 +1,17 @@
-import { Outlet } from 'react-router-dom';
+import { StyledMain, StyledSection, StyledSectionHeadingWrapper, StyledSectionContent } from './Pages/styles';
+import { IPageProps } from './Pages/types';
 
-const AtlyginimoMokesciuSkaiciuokle = () => {
+const AtlyginimoMokesciuSkaiciuokle = ({ headingText, theme }: IPageProps) => {
     return (
-        <main>
-            <Outlet />
-            <h2>atlyginimoo mokesciu skaiciuokle</h2>
-        </main>
+        <StyledMain>
+            <StyledSection>
+                <StyledSectionHeadingWrapper theme={theme}>
+                    <h3>{headingText}</h3>
+                </StyledSectionHeadingWrapper>
+
+                <StyledSectionContent theme={theme}></StyledSectionContent>
+            </StyledSection>
+        </StyledMain>
     );
 };
 

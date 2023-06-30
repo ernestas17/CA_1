@@ -6,7 +6,8 @@ export const StyledFooter = styled.footer`
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px 50px;
+    padding: 0 50px;
+    min-height: 6vh;
 `;
 
 export const StyledFooterText = styled.p`
