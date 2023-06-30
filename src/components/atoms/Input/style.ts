@@ -6,7 +6,7 @@ export const StyledInput = styled.input<IInputProps>`
     border-radius: 3px;
     box-shadow: none;
     outline: none;
-    border: 1px solid #485fc7;
+    border: 1px solid ${(props) => (props.theme ? props.theme.background : 'initial')};
     font-size: 14px;
     width: 100%;
 `;

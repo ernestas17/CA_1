@@ -1,4 +1,5 @@
-import { StyledInputWrapper, StyledInput } from './style';
+import { IColorTheme } from '../../../shared/color_themes';
+import { StyledInput } from './style';
 import { ChangeEventHandler, MutableRefObject } from 'react';
 
 export interface IInputProps {
@@ -11,13 +12,14 @@ export interface IInputProps {
     max?: string;
     value?: string | number;
     disabled?: boolean;
+    theme?: IColorTheme;
 }
 
 interface IData {
     [key: string]: string;
 }
 
-const Input = ({ type, changeEvent, identifier, innerRef, data, min, max, value, disabled }: IInputProps) => {
+const Input = ({ type, changeEvent, identifier, innerRef, data, min, max, value, disabled, theme }: IInputProps) => {
     return (
         <StyledInput
             {...data}
@@ -31,6 +33,7 @@ const Input = ({ type, changeEvent, identifier, innerRef, data, min, max, value,
             name={identifier}
             onChange={changeEvent}
             type={type}
+            theme={theme}
         />
     );
 };

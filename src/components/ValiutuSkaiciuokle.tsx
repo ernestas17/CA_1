@@ -131,6 +131,7 @@ const ValiutuSkaiciuokle = ({ headingText, theme, layoutbreakpoint }: IPageProps
                     <StyledYearSelectWrapper>
                         <label htmlFor='date-select'>Valiutos kurso data: </label>
                         <Input
+                            theme={theme}
                             type='date'
                             identifier='date-select'
                             changeEvent={(e) => setCurrentDate(e.target.value)}
@@ -170,6 +171,7 @@ const ValiutuSkaiciuokle = ({ headingText, theme, layoutbreakpoint }: IPageProps
                                     identifier='currency-input'
                                     innerRef={currencyInputRef}
                                     data={{ 'data-currency': currencyCode }}
+                                    theme={theme}
                                 />
                             </div>
                         </StyledSelectedCurrencyWrapper>
@@ -232,7 +234,13 @@ const ValiutuSkaiciuokle = ({ headingText, theme, layoutbreakpoint }: IPageProps
                                                 </StyledCurrencyOutputInfoWrapper>
 
                                                 <StyledCurrencyOutputContainer theme={theme}>
-                                                    <Input type='text' disabled identifier='currency-output' data={{ 'data-currency': currency }} />
+                                                    <Input
+                                                        theme={theme}
+                                                        type='text'
+                                                        disabled
+                                                        identifier='currency-output'
+                                                        data={{ 'data-currency': currency }}
+                                                    />
 
                                                     <i
                                                         onClick={(e) => removeCurrencyInput(e)}
