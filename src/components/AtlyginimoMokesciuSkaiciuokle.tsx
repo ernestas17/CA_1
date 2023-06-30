@@ -1,9 +1,9 @@
 import { StyledMain, StyledSection, StyledSectionHeadingWrapper, StyledSectionContent } from './Pages/styles';
 import { IPageProps } from './Pages/types';
 
-const AtlyginimoMokesciuSkaiciuokle = ({ headingText, theme }: IPageProps) => {
+const AtlyginimoMokesciuSkaiciuokle = ({ headingText, theme, layoutbreakpoint }: IPageProps) => {
     return (
-        <StyledMain>
+        <StyledMain layoutbreakpoint={layoutbreakpoint}>
             <StyledSection>
                 <StyledSectionHeadingWrapper theme={theme}>
                     <h3>{headingText}</h3>
