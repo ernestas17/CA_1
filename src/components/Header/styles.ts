@@ -6,11 +6,13 @@ export const StyledHeader = styled.header<IHeaderProps>`
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 6vh;
 
     @media (min-width: ${(props) => (props.breakpoint ? props.breakpoint : '1200px')}) {
-        padding: 0 50px;
         display: grid;
         justify-content: initial;
+    }
+    @media (min-width: ${(props) => (props.layoutbreakpoint ? props.layoutbreakpoint : '768px')}) {
+        padding: 0 50px;
+        min-height: 6vh;
     }
 `;

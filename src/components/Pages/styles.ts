@@ -1,9 +1,9 @@
 import styled from 'styled-components';
+import { IPageProps } from './types';
 
-export const StyledMain = styled.main`
-    padding: 50px;
+export const StyledMain = styled.main<IPageProps>`
+    padding: 20px;
     max-width: 1200px;
-    min-height: 88vh;
     margin: 0 auto;
     display: flex;
     justify-content: stretch;
@@ -11,6 +11,11 @@ export const StyledMain = styled.main`
     input,
     select {
         padding: 5px;
+    }
+
+    @media (min-width: ${(props) => (props.layoutbreakpoint ? props.layoutbreakpoint : '1200px')}) {
+        min-height: 88vh;
+        padding: 50px;
     }
 `;
 

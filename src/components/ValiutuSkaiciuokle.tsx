@@ -32,7 +32,7 @@ export interface ICurrencyObject {
 const minDate = '2000-01-01';
 const today = new Date().toLocaleDateString('en-CA');
 
-const ValiutuSkaiciuokle = ({ headingText, theme }: IPageProps) => {
+const ValiutuSkaiciuokle = ({ headingText, theme, layoutbreakpoint }: IPageProps) => {
     const [availableCurrencies, setAvailableCurrencies] = useState<null | ICurrencyObject>(null);
     const [decimalNumbers, setDecimalNumbers] = useState<number>(2);
     const [currencyInputList, setCurrencyInputList] = useState<string[]>(['CAD', 'PLN', 'USD', 'NZD', 'MXN', 'SGD']);
@@ -115,7 +115,7 @@ const ValiutuSkaiciuokle = ({ headingText, theme }: IPageProps) => {
     console.log('updating');
 
     return (
-        <StyledMain>
+        <StyledMain layoutbreakpoint={layoutbreakpoint}>
             <StyledSection>
                 <StyledSectionHeadingWrapper theme={theme}>
                     <h3>{headingText}</h3>

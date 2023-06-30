@@ -4,11 +4,17 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { LINK_LIST } from '../../shared/link_list';
 import { NAV_ALIGNMENT } from '../Navigation/Navigation';
-import { currentTheme } from '../../shared/color_themes';
+import { IColorTheme, currentTheme } from '../../shared/color_themes';
+// import { navBreakpoint, layoutHeightBreakpoint } from '../../shared/color_themes';
 
 export interface IHeaderProps {
     breakpoint: string;
+    layoutbreakpoint: string;
+    theme: IColorTheme;
 }
+
+const navigationBreakpoint = '1220px';
+const layoutHeightBreakpoint = '768px';
 
 const Header = () => {
     const location = useLocation();
@@ -19,13 +25,11 @@ const Header = () => {
         setUrl(pathname);
     }, [location, pathname]);
 
-    const breakpoint = '1200px';
-
     return (
-        <StyledHeader breakpoint={breakpoint} theme={currentTheme}>
+        <StyledHeader breakpoint={navigationBreakpoint} theme={currentTheme} layoutbreakpoint={layoutHeightBreakpoint}>
             <Navigation
                 theme={currentTheme}
-                breakpoint={breakpoint}
+                breakpoint={navigationBreakpoint}
                 currentUrl={url}
                 linkList={LINK_LIST}
                 burgeralign={NAV_ALIGNMENT.right}
