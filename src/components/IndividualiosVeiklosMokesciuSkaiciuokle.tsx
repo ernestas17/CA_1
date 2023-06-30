@@ -1,9 +1,9 @@
 import { StyledMain, StyledSection, StyledSectionHeadingWrapper, StyledSectionContent } from './Pages/styles';
 import { IPageProps } from './Pages/types';
 
-const IndividualiosVeiklosMokesciuSkaiciuokle = ({ headingText, theme }: IPageProps) => {
+const IndividualiosVeiklosMokesciuSkaiciuokle = ({ headingText, theme, layoutbreakpoint }: IPageProps) => {
     return (
-        <StyledMain>
+        <StyledMain layoutbreakpoint={layoutbreakpoint}>
             <StyledSection>
                 <StyledSectionHeadingWrapper theme={theme}>
                     <h3>{headingText}</h3>
