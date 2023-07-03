@@ -49,44 +49,33 @@ const ValiutuSkaiciuokle = ({ headingText, theme, layoutbreakpoint }: IPageProps
     const currencyInputRef = useRef();
 
     const getCurrencyRates = async (date: string, currency: string) => {
-        console.log('getting rates');
-        console.log(currentDate);
-        console.log(currencyCode);
-
         const isToday = today === date;
 
         const data = isToday ? await currency_api.getLatestRates(currency) : await currency_api.getHistoricalRates(date, currency);
 
-        console.log(data);
-
         setCurrencyRates(() => data);
-
-        // return { isToday, data };
     };
     const updateOutputValues = useCallback(
         async (target: HTMLInputElement | undefined) => {
             if (!target || !target.value) return;
             const targetInputValue = parseFloat(target.value);
-            const targetInputCurrency = target.getAttribute('data-currency') as string;
 
-            // const isToday = today === date;
-            const isToday = new Date().toLocaleDateString('en-CA') === currentDate;
-            console.log(isToday);
-            // const dt = await getCurrencyRates(currentDate, targetInputCurrency);
-            // const { isToday, data } = await getCurrencyRates(currentDate, targetInputCurrency);
+            const isToday = today === currentDate;
 
             const allCurrencyInputs: NodeListOf<HTMLInputElement> = document.querySelectorAll('.currency-output');
 
             allCurrencyInputs.forEach((input) => {
-                const inputCurrency = input.getAttribute('data-currency') as string;
-                console.log(inputCurrency);
-                const availableData = isToday
-                    ? parseFloat(currencyRates?.[inputCurrency])
-                    : parseFloat(currencyRates?.[currentDate]?.[inputCurrency]);
-                console.log(currencyRates);
-                console.log(availableData);
+                if (currencyRates) {
+                    if (!isToday) if (!currencyRates[currentDate]) return;
 
-                input.value = (availableData * targetInputValue).toFixed(decimalNumbers);
+                    const inputCurrency = input.getAttribute('data-currency') as string;
+
+                    const availableData = isToday
+                        ? parseFloat(currencyRates?.[inputCurrency])
+                        : parseFloat(currencyRates?.[currentDate]?.[inputCurrency]);
+
+                    input.value = (availableData * targetInputValue).toFixed(decimalNumbers);
+                }
             });
         },
         [currentDate, decimalNumbers, currencyRates]
@@ -125,7 +114,6 @@ const ValiutuSkaiciuokle = ({ headingText, theme, layoutbreakpoint }: IPageProps
 
     useEffect(() => {
         (async () => {
-            console.log('getting available currencies');
             const data = await currency_api.getAvailableCurrencies();
             setAvailableCurrencies(() => data);
         })();
@@ -133,7 +121,7 @@ const ValiutuSkaiciuokle = ({ headingText, theme, layoutbreakpoint }: IPageProps
 
     useEffect(() => {
         if (currencyInputRef.current) updateOutputValues(currencyInputRef.current);
-    }, [currencyCode, updateOutputValues]);
+    }, [currencyCode, updateOutputValues, currencyInputList, currentDate]);
 
     useEffect(() => {
         getCurrencyRates(currentDate, currencyCode);
@@ -153,7 +141,7 @@ const ValiutuSkaiciuokle = ({ headingText, theme, layoutbreakpoint }: IPageProps
                             theme={theme}
                             type='date'
                             identifier='date-select'
-                            changeEvent={(e) => setCurrentDate(e.target.value)}
+                            changeEvent={(e) => setCurrentDate(() => e.target.value)}
                             min={minDate}
                             max={today}
                             value={currentDate}
