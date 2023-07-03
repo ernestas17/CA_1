@@ -1,15 +1,41 @@
-import { StyledInputWrapper, StyledInput } from './style';
+import { IColorTheme } from '../../../shared/color_themes';
+import { StyledInput } from './style';
+import { ChangeEventHandler, MutableRefObject } from 'react';
 
-interface IInputProps {
-  type: 'number' | 'checkbox' | 'date' | 'radio';
+export interface IInputProps {
+    type: 'number' | 'checkbox' | 'date' | 'radio' | 'text';
+    changeEvent?: ChangeEventHandler<HTMLInputElement>;
+    identifier?: string;
+    innerRef?: MutableRefObject<HTMLInputElement> | MutableRefObject<undefined>;
+    data?: IData;
+    min?: string;
+    max?: string;
+    value?: string | number;
+    disabled?: boolean;
+    theme?: IColorTheme;
 }
 
-const Input = ({ type }: IInputProps) => {
-  return (
-    <StyledInputWrapper>
-      <StyledInput type={type} />
-    </StyledInputWrapper>
-  );
+interface IData {
+    [key: string]: string;
+}
+
+const Input = ({ type, changeEvent, identifier, innerRef, data, min, max, value, disabled, theme }: IInputProps) => {
+    return (
+        <StyledInput
+            {...data}
+            disabled={disabled}
+            value={value}
+            min={min}
+            max={max}
+            ref={innerRef}
+            className={identifier}
+            id={identifier}
+            name={identifier}
+            onChange={changeEvent}
+            type={type}
+            theme={theme}
+        />
+    );
 };
 
 export default Input;
