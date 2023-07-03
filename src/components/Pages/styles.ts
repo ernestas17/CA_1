@@ -42,6 +42,7 @@ export const StyledSectionContent = styled.div`
     width: 100%;
     height: 100%;
     border-radius: 0 0 5px 5px;
+    min-height: 60vh;
 `;
 
 // --- Valiutu skaiciuokle styles

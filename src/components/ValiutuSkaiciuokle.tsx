@@ -30,6 +30,8 @@ export interface ICurrency {
 import { IPageProps } from './Pages/types';
 import Input from './atoms/Input';
 import Select from './atoms/Select';
+import Label from './atoms/Label';
+import Loader from './atoms/Loader';
 
 export interface ICurrencyObject {
     [key: string]: ICurrency;
@@ -59,6 +61,7 @@ const ValiutuSkaiciuokle = ({ headingText, theme, layoutbreakpoint }: IPageProps
         async (target: HTMLInputElement | undefined) => {
             if (!target || !target.value) return;
             const targetInputValue = parseFloat(target.value);
+            // if (targetInputValue < 0) return (target.value = 0);
 
             const isToday = today === currentDate;
 
@@ -135,133 +138,151 @@ const ValiutuSkaiciuokle = ({ headingText, theme, layoutbreakpoint }: IPageProps
                 </StyledSectionHeadingWrapper>
 
                 <StyledSectionContent theme={theme}>
-                    <StyledYearSelectWrapper>
-                        <label htmlFor='date-select'>Valiutos kurso data: </label>
-                        <Input
-                            theme={theme}
-                            type='date'
-                            identifier='date-select'
-                            changeEvent={(e) => setCurrentDate(() => e.target.value)}
-                            min={minDate}
-                            max={today}
-                            value={currentDate}
-                        />
-                    </StyledYearSelectWrapper>
-
-                    <StyledDivider></StyledDivider>
-
-                    <StyledWrapper>
-                        <StyledSelectedCurrencyWrapper>
-                            <div>
-                                <label htmlFor='selected-currency'>Pasirinkta valiuta</label>
-
-                                <Select theme={theme} changeEvent={(e) => currencyChangeHandler(e)} identifier='selected-currency'>
-                                    {availableCurrencies &&
-                                        Object.keys(availableCurrencies).map((currency) => {
-                                            const currentCurrency = availableCurrencies[currency];
-                                            const { code, name } = currentCurrency;
-                                            return (
-                                                <option key={code} value={code}>
-                                                    {`${name} (${code})`}
-                                                </option>
-                                            );
-                                        })}
-                                </Select>
-                            </div>
-
-                            <div>
-                                <label htmlFor='currency-input'>Suma</label>
-
+                    {!currencyRates && <Loader iconSize='50px' iconColor={theme?.background} />}
+                    {currencyRates && (
+                        <>
+                            <StyledYearSelectWrapper>
+                                <Label targetinput='date-select' size='18px'>
+                                    Valiutos kurso data:
+                                </Label>
                                 <Input
-                                    type='number'
-                                    changeEvent={(e) => updateOutputValues(e?.target)}
-                                    identifier='currency-input'
-                                    innerRef={currencyInputRef}
-                                    data={{ 'data-currency': currencyCode }}
                                     theme={theme}
+                                    type='date'
+                                    identifier='date-select'
+                                    changeEvent={(e) => setCurrentDate(() => e.target.value)}
+                                    min={minDate}
+                                    max={today}
+                                    value={currentDate}
                                 />
-                            </div>
-                        </StyledSelectedCurrencyWrapper>
+                            </StyledYearSelectWrapper>
 
-                        <StyledAddNewCurrencyContainer>
-                            <StyledAddNewCurrencyWrapper>
-                                <div>
-                                    <label htmlFor='currencies'>Pridėti valiutą</label>
+                            <StyledDivider></StyledDivider>
 
-                                    <Select theme={theme} changeEvent={addNewCurrency} identifier='currencies' defaultvalue={'pasirinkite'}>
-                                        <option disabled key='pasirinkite' value='pasirinkite'>
-                                            - Pasirinkite -
-                                        </option>
-                                        {availableCurrencies &&
-                                            Object.keys(availableCurrencies).map((currency) => {
-                                                const currentCurrency = availableCurrencies[currency];
-                                                const { code, name } = currentCurrency;
-                                                if (currencyCode !== code) {
+                            <StyledWrapper>
+                                <StyledSelectedCurrencyWrapper>
+                                    <div>
+                                        <Label targetinput='selected-currency' size='18px'>
+                                            Pasirinkta valiuta
+                                        </Label>
+
+                                        <Select theme={theme} changeEvent={(e) => currencyChangeHandler(e)} identifier='selected-currency'>
+                                            {availableCurrencies &&
+                                                Object.keys(availableCurrencies).map((currency) => {
+                                                    const currentCurrency = availableCurrencies[currency];
+                                                    const { code, name } = currentCurrency;
                                                     return (
                                                         <option key={code} value={code}>
                                                             {`${name} (${code})`}
                                                         </option>
                                                     );
-                                                }
-                                            })}
-                                    </Select>
-                                </div>
+                                                })}
+                                        </Select>
+                                    </div>
 
-                                <div>
-                                    <label>Skaičiai po kablelio</label>
+                                    <div>
+                                        <Label targetinput='currency-input' size='18px'>
+                                            Suma
+                                        </Label>
+                                        <Input
+                                            type='number'
+                                            changeEvent={(e) => updateOutputValues(e?.target)}
+                                            identifier='currency-input'
+                                            innerRef={currencyInputRef}
+                                            data={{ 'data-currency': currencyCode }}
+                                            theme={theme}
+                                            min='0'
+                                        />
+                                    </div>
+                                </StyledSelectedCurrencyWrapper>
 
-                                    <Select
-                                        defaultvalue={2}
-                                        theme={theme}
-                                        changeEvent={(e) => setDecimalNumbers(() => parseInt((e.target as HTMLSelectElement).value))}
-                                        identifier='decimal-numbers'
-                                    >
-                                        {[0, 1, 2, 3, 4, 5].map((num) => {
-                                            return (
-                                                <option key={'decimal-numbers-' + num} value={num}>
-                                                    {num}
+                                <StyledAddNewCurrencyContainer>
+                                    <StyledAddNewCurrencyWrapper>
+                                        <div>
+                                            <Label targetinput='currencies' size='18px'>
+                                                Pridėti valiutą
+                                            </Label>
+
+                                            <Select theme={theme} changeEvent={addNewCurrency} identifier='currencies' defaultvalue={'pasirinkite'}>
+                                                <option disabled key='pasirinkite' value='pasirinkite'>
+                                                    - Pasirinkite -
                                                 </option>
-                                            );
+                                                {availableCurrencies &&
+                                                    Object.keys(availableCurrencies).map((currency) => {
+                                                        const currentCurrency = availableCurrencies[currency];
+                                                        const { code, name } = currentCurrency;
+                                                        if (currencyCode !== code) {
+                                                            return (
+                                                                <option key={code} value={code}>
+                                                                    {`${name} (${code})`}
+                                                                </option>
+                                                            );
+                                                        }
+                                                    })}
+                                            </Select>
+                                        </div>
+
+                                        <div>
+                                            <Label targetinput='decimal-numbers' size='18px'>
+                                                Skaičiai po kablelio
+                                            </Label>
+
+                                            <Select
+                                                defaultvalue={2}
+                                                theme={theme}
+                                                changeEvent={(e) => setDecimalNumbers(() => parseInt((e.target as HTMLSelectElement).value))}
+                                                identifier='decimal-numbers'
+                                            >
+                                                {[0, 1, 2, 3, 4, 5].map((num) => {
+                                                    return (
+                                                        <option key={'decimal-numbers-' + num} value={num}>
+                                                            {num}
+                                                        </option>
+                                                    );
+                                                })}
+                                            </Select>
+                                        </div>
+                                    </StyledAddNewCurrencyWrapper>
+
+                                    <StyledCurrencyOutputList>
+                                        {currencyInputList.map((currency) => {
+                                            if (currencyCode !== currency) {
+                                                return (
+                                                    <StyledSingleOutputWrapper
+                                                        key={currency + '-' + 'input-wrapper'}
+                                                        className='currency-output-wrapper'
+                                                    >
+                                                        <StyledCurrencyOutputInfoWrapper className='currency-info-wrapper'>
+                                                            <img
+                                                                src={`https://wise.com/public-resources/assets/flags/rectangle/${currency.toLowerCase()}.png`}
+                                                                alt='currency flag'
+                                                            />
+                                                            <span className='currency-code'>{currency}</span>
+                                                        </StyledCurrencyOutputInfoWrapper>
+
+                                                        <StyledCurrencyOutputContainer theme={theme}>
+                                                            <Input
+                                                                theme={theme}
+                                                                type='text'
+                                                                disabled
+                                                                identifier='currency-output'
+                                                                data={{ 'data-currency': currency }}
+                                                            />
+
+                                                            <i
+                                                                onClick={(e) => removeCurrencyInput(e)}
+                                                                data-currency={currency}
+                                                                className='fa-solid fa-xmark currency-remove'
+                                                            ></i>
+                                                        </StyledCurrencyOutputContainer>
+                                                    </StyledSingleOutputWrapper>
+                                                );
+                                            }
                                         })}
-                                    </Select>
-                                </div>
-                            </StyledAddNewCurrencyWrapper>
-
-                            <StyledCurrencyOutputList>
-                                {currencyInputList.map((currency) => {
-                                    if (currencyCode !== currency) {
-                                        return (
-                                            <StyledSingleOutputWrapper key={currency + '-' + 'input-wrapper'} className='currency-output-wrapper'>
-                                                <StyledCurrencyOutputInfoWrapper className='currency-info-wrapper'>
-                                                    <img
-                                                        src={`https://wise.com/public-resources/assets/flags/rectangle/${currency.toLowerCase()}.png`}
-                                                        alt='currency flag'
-                                                    />
-                                                    <span className='currency-code'>{currency}</span>
-                                                </StyledCurrencyOutputInfoWrapper>
-
-                                                <StyledCurrencyOutputContainer theme={theme}>
-                                                    <Input
-                                                        theme={theme}
-                                                        type='text'
-                                                        disabled
-                                                        identifier='currency-output'
-                                                        data={{ 'data-currency': currency }}
-                                                    />
-
-                                                    <i
-                                                        onClick={(e) => removeCurrencyInput(e)}
-                                                        data-currency={currency}
-                                                        className='fa-solid fa-xmark currency-remove'
-                                                    ></i>
-                                                </StyledCurrencyOutputContainer>
-                                            </StyledSingleOutputWrapper>
-                                        );
-                                    }
-                                })}
-                            </StyledCurrencyOutputList>
-                        </StyledAddNewCurrencyContainer>
-                    </StyledWrapper>
+                                    </StyledCurrencyOutputList>
+                                </StyledAddNewCurrencyContainer>
+                            </StyledWrapper>
+                        </>
+                    )}
                 </StyledSectionContent>
             </StyledSection>
         </StyledMain>
