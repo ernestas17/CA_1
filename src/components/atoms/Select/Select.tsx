@@ -10,7 +10,7 @@ export interface IOptionProps {
     data?: IData;
     min?: string;
     max?: string;
-    value?: string | number;
+    defaultvalue?: string | number;
     disabled?: boolean;
     children?: JSX.Element | JSX.Element[] | null | undefined | any;
     theme?: IColorTheme;
@@ -20,9 +20,9 @@ interface IData {
     [key: string]: string;
 }
 
-const Select = ({ changeEvent, identifier, children, theme, value }: IOptionProps) => {
+const Select = ({ changeEvent, identifier, children, theme, defaultvalue }: IOptionProps) => {
     return (
-        <StyledSelect defaultValue={value} theme={theme} className={identifier} id={identifier} name={identifier} onChange={changeEvent}>
+        <StyledSelect defaultValue={defaultvalue} theme={theme} className={identifier} id={identifier} name={identifier} onChange={changeEvent}>
             {children}
         </StyledSelect>
     );

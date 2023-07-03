@@ -40,6 +40,7 @@ const today = new Date().toLocaleDateString('en-CA');
 
 const ValiutuSkaiciuokle = ({ headingText, theme, layoutbreakpoint }: IPageProps) => {
     const [availableCurrencies, setAvailableCurrencies] = useState<null | ICurrencyObject>(null);
+    const [currencyRates, setCurrencyRates] = useState<null | ICurrencyObject>(null);
     const [decimalNumbers, setDecimalNumbers] = useState<number>(2);
     const [currencyInputList, setCurrencyInputList] = useState<string[]>(['CAD', 'PLN', 'USD', 'NZD', 'MXN', 'SGD']);
     const [currentDate, setCurrentDate] = useState<string>(today);
@@ -47,37 +48,53 @@ const ValiutuSkaiciuokle = ({ headingText, theme, layoutbreakpoint }: IPageProps
 
     const currencyInputRef = useRef();
 
+    const getCurrencyRates = async (date: string, currency: string) => {
+        console.log('getting rates');
+        console.log(currentDate);
+        console.log(currencyCode);
+
+        const isToday = today === date;
+
+        const data = isToday ? await currency_api.getLatestRates(currency) : await currency_api.getHistoricalRates(date, currency);
+
+        console.log(data);
+
+        setCurrencyRates(() => data);
+
+        // return { isToday, data };
+    };
     const updateOutputValues = useCallback(
         async (target: HTMLInputElement | undefined) => {
             if (!target || !target.value) return;
             const targetInputValue = parseFloat(target.value);
             const targetInputCurrency = target.getAttribute('data-currency') as string;
 
-            const { isToday, data } = await getCurrencyRates(currentDate, targetInputCurrency);
+            // const isToday = today === date;
+            const isToday = new Date().toLocaleDateString('en-CA') === currentDate;
+            console.log(isToday);
+            // const dt = await getCurrencyRates(currentDate, targetInputCurrency);
+            // const { isToday, data } = await getCurrencyRates(currentDate, targetInputCurrency);
 
             const allCurrencyInputs: NodeListOf<HTMLInputElement> = document.querySelectorAll('.currency-output');
 
             allCurrencyInputs.forEach((input) => {
                 const inputCurrency = input.getAttribute('data-currency') as string;
-                const availableData = isToday ? parseFloat(data[inputCurrency]) : parseFloat(data[currentDate][inputCurrency]);
+                console.log(inputCurrency);
+                const availableData = isToday
+                    ? parseFloat(currencyRates?.[inputCurrency])
+                    : parseFloat(currencyRates?.[currentDate]?.[inputCurrency]);
+                console.log(currencyRates);
+                console.log(availableData);
 
                 input.value = (availableData * targetInputValue).toFixed(decimalNumbers);
             });
         },
-        [currentDate, decimalNumbers]
+        [currentDate, decimalNumbers, currencyRates]
     );
-
-    const getCurrencyRates = async (date: string, currency: string) => {
-        const isToday = today === date;
-
-        const data = isToday ? await currency_api.getLatestRates(currency) : await currency_api.getHistoricalRates(date, currency);
-
-        return { isToday, data };
-    };
 
     const addNewCurrency = (e: ChangeEvent) => {
         const currencyValue = (e.target as HTMLSelectElement).value;
-        if (currencyInputList.includes(currencyValue)) return console.log('Input already exists');
+        if (currencyInputList.includes(currencyValue)) return;
 
         if (currencyCode) setCurrencyInputList((prev) => [...prev, currencyValue]);
 
@@ -89,9 +106,6 @@ const ValiutuSkaiciuokle = ({ headingText, theme, layoutbreakpoint }: IPageProps
 
         const index = currencyInputList.indexOf(currentCurrency);
 
-        console.log(currentCurrency);
-        console.log(index);
-
         if (index < 0) return;
         const newCurrencyInputList = [...currencyInputList];
         newCurrencyInputList.splice(index, 1);
@@ -99,16 +113,19 @@ const ValiutuSkaiciuokle = ({ headingText, theme, layoutbreakpoint }: IPageProps
         setCurrencyInputList(() => newCurrencyInputList);
     };
 
-    const currencyChangeHandler = (e) => {
+    const currencyChangeHandler = (e: ChangeEvent) => {
+        const target = e.target as HTMLSelectElement;
+
         const index = currencyInputList.indexOf(currencyCode);
 
         if (index >= 0) [...currencyInputList].splice(index, 1);
 
-        setCurrencyCode(() => e.target.value);
+        setCurrencyCode(() => target.value);
     };
 
     useEffect(() => {
         (async () => {
+            console.log('getting available currencies');
             const data = await currency_api.getAvailableCurrencies();
             setAvailableCurrencies(() => data);
         })();
@@ -118,7 +135,9 @@ const ValiutuSkaiciuokle = ({ headingText, theme, layoutbreakpoint }: IPageProps
         if (currencyInputRef.current) updateOutputValues(currencyInputRef.current);
     }, [currencyCode, updateOutputValues]);
 
-    console.log('updating');
+    useEffect(() => {
+        getCurrencyRates(currentDate, currencyCode);
+    }, [currentDate, currencyCode]);
 
     return (
         <StyledMain layoutbreakpoint={layoutbreakpoint}>
@@ -166,7 +185,7 @@ const ValiutuSkaiciuokle = ({ headingText, theme, layoutbreakpoint }: IPageProps
                                 <label htmlFor='currency-input'>Suma</label>
 
                                 <Input
-                                    type='text'
+                                    type='number'
                                     changeEvent={(e) => updateOutputValues(e?.target)}
                                     identifier='currency-input'
                                     innerRef={currencyInputRef}
@@ -181,8 +200,8 @@ const ValiutuSkaiciuokle = ({ headingText, theme, layoutbreakpoint }: IPageProps
                                 <div>
                                     <label htmlFor='currencies'>Pridėti valiutą</label>
 
-                                    <Select theme={theme} changeEvent={addNewCurrency} identifier='currencies'>
-                                        <option disabled selected key='pasirinkite' value='pasirinkite'>
+                                    <Select theme={theme} changeEvent={addNewCurrency} identifier='currencies' defaultvalue={'pasirinkite'}>
+                                        <option disabled key='pasirinkite' value='pasirinkite'>
                                             - Pasirinkite -
                                         </option>
                                         {availableCurrencies &&
@@ -204,7 +223,7 @@ const ValiutuSkaiciuokle = ({ headingText, theme, layoutbreakpoint }: IPageProps
                                     <label>Skaičiai po kablelio</label>
 
                                     <Select
-                                        value={2}
+                                        defaultvalue={2}
                                         theme={theme}
                                         changeEvent={(e) => setDecimalNumbers(() => parseInt((e.target as HTMLSelectElement).value))}
                                         identifier='decimal-numbers'
