@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { IColorTheme } from '../../../shared/color_themes';
 import { StyledInput } from './style';
 import { ChangeEventHandler, MutableRefObject } from 'react';
@@ -37,5 +38,19 @@ const Input = ({ type, changeEvent, identifier, innerRef, data, min, max, value,
         />
     );
 };
+=======
+import { useState, ChangeEvent, useEffect } from 'react';
+import { StyledInputWrapper, StyledInput } from './style';
+
+type InputType = 'number' | 'checkbox' | 'date' | 'radio';
+
+interface IInputProps {
+  type: InputType;
+  value: any;
+  onChange: (value: any) => void;
+}
+
+const Input = () => {};
+>>>>>>> eb89a74 (test)
 
 export default Input;
