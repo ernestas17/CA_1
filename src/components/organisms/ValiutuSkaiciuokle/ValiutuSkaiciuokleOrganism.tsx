@@ -133,11 +133,7 @@ const ValiutuSkaiciuokleOrganism = ({ theme }: IValiutuSkaiciuokleProps) => {
 
     return (
         <>
-            {!currencyRates && (
-                <>
-                    <Loader iconSize='50px' iconColor={theme?.background} />{' '}
-                </>
-            )}
+            {!currencyRates && <Loader iconSize='50px' iconColor={theme?.background} />}
 
             {currencyRates && (
                 <>
