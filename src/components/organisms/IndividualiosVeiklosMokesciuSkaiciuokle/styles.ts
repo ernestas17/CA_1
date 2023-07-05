@@ -8,29 +8,10 @@ export const StyledDivider = styled.div`
 
 export const StyledWrapper = styled.div`
   display: flex;
-  flex-direction: column;
-  gap: 20px;
-  width: 100%;
-
-  @media (min-width: 1024px) {
-    flex-direction: row;
-    gap: 50px;
-  }
 `;
 
-export const StyledIputsWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: start;
-  justify-content: center;
-  gap: 3px;
-  width: 100%;
+export const StyledIputsWrapper = styled.div``;
+export const StyledRadiosWrapper = styled.div`
+  dispay: flex;
 `;
-export const StyledOutputsWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: start;
-  justify-content: center;
-  gap: 3px;
-  width: 100%;
-`;
+export const StyledOutputsWrapper = styled.div``;

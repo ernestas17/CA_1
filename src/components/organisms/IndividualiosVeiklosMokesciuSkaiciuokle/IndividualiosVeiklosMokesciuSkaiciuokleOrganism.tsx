@@ -2,6 +2,7 @@ import { useState, ChangeEvent, useEffect } from 'react';
 import {
   StyledWrapper,
   StyledIputsWrapper,
+  StyledRadiosWrapper,
   StyledOutputsWrapper,
   StyledDivider,
 } from './styles';
@@ -229,30 +230,32 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
                 />
               </div>
               <div>
-                <Input
-                  theme={theme}
-                  type='radio'
-                  identifier='radio-0.3'
-                  value={0.3}
-                  checked={radioValue === 0.3}
-                  changeEvent={() => handleRadioValueChange(0.3)}
-                />
-                <Label targetinput='radio-0.3' size='18px'>
-                  30% nuo pajamų
-                </Label>
-              </div>
-              <div>
-                <Input
-                  theme={theme}
-                  type='radio'
-                  identifier='radio-0'
-                  value={0}
-                  checked={radioValue === 0}
-                  changeEvent={() => handleRadioValueChange(0)}
-                />
-                <Label targetinput='radio-0' size='18px'>
-                  faktinės išlaidos
-                </Label>
+                <StyledRadiosWrapper>
+                  <Input
+                    theme={theme}
+                    type='radio'
+                    identifier='radio-0.3'
+                    value={0.3}
+                    checked={radioValue === 0.3}
+                    changeEvent={() => handleRadioValueChange(0.3)}
+                  />
+                  <Label targetinput='radio-0.3' size='18px'>
+                    30% nuo pajamų
+                  </Label>
+                </StyledRadiosWrapper>
+                <div>
+                  <Input
+                    theme={theme}
+                    type='radio'
+                    identifier='radio-0'
+                    value={0}
+                    checked={radioValue === 0}
+                    changeEvent={() => handleRadioValueChange(0)}
+                  />
+                  <Label targetinput='radio-0' size='18px'>
+                    faktinės išlaidos
+                  </Label>
+                </div>
               </div>
               <div>
                 <Label targetinput='expenses-value' size='18px'>
