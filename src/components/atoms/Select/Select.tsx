@@ -1,31 +1,42 @@
-import { IColorTheme } from '../../../shared/color_themes';
-import { StyledSelect } from './styles';
-import { ChangeEventHandler, MutableRefObject } from 'react';
+import { useState, useEffect } from 'react';
 
-export interface IOptionProps {
-    label?: string | number;
-    changeEvent?: ChangeEventHandler<HTMLSelectElement>;
-    identifier?: string;
-    innerRef?: MutableRefObject<HTMLSelectElement> | MutableRefObject<undefined>;
-    data?: IData;
-    min?: string;
-    max?: string;
-    defaultvalue?: string | number;
-    disabled?: boolean;
-    children?: JSX.Element | JSX.Element[] | null | undefined | any;
-    theme?: IColorTheme;
+interface IOptionProps {
+  value: string;
+  label: string | number;
 }
 
-interface IData {
-    [key: string]: string;
-}
+const Select = () => {
+  const [options, setOptions] = useState<IOptionProps[]>([]);
+  const [selectedValue, setSelectedValue] = useState<string>('');
 
-const Select = ({ changeEvent, identifier, children, theme, defaultvalue }: IOptionProps) => {
-    return (
-        <StyledSelect defaultValue={defaultvalue} theme={theme} className={identifier} id={identifier} name={identifier} onChange={changeEvent}>
-            {children}
-        </StyledSelect>
-    );
+  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = event.target.value;
+    setSelectedValue(value);
+  };
+
+  const populateDropdown = () => {
+    // Priklausomai nuo puslapio, kokių reikės duomenų
+    const fetchedOptions: IOptionProps[] = [
+      { value: '1', label: 'Option 1' },
+      { value: '2', label: 'Option 2' },
+      { value: '3', label: 100 },
+    ];
+    setOptions(fetchedOptions);
+  };
+
+  useEffect(() => {
+    populateDropdown();
+  }, []);
+
+  return (
+    <select value={selectedValue} onChange={handleSelectChange}>
+      {options.map((option) => (
+        <option key={option.value} value={option.value}>
+          {option.label}
+        </option>
+      ))}
+    </select>
+  );
 };
 
 export default Select;
