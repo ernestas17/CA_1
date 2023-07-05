@@ -1,9 +1,8 @@
 import { useState, ChangeEvent, useEffect } from 'react';
 import {
-  //   StyledMain,
-  //   StyledSection,
-  //   StyledSectionHeadingWrapper,
-  //   StyledSectionContent,
+  StyledWrapper,
+  StyledIputsWrapper,
+  StyledOutputsWrapper,
   StyledDivider,
 } from './styles';
 
@@ -11,7 +10,6 @@ import { IColorTheme } from '../../../shared/color_themes';
 
 import Input from '../../atoms/Input';
 import Label from '../../atoms/Label';
-import Loader from '../../atoms/Loader';
 
 interface IIndvVeiklosMokesciuSkaiciuokleProps {
   theme?: IColorTheme;
@@ -52,20 +50,35 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
     setCalcSSI(finalSSI);
 
     const payableSsi =
-      Math.round((taxableIncome * taxRate - paidSSI) * 100) / 100;
+      Math.round((taxableIncome * taxRate - (paidSSI ? paidSSI : 0)) * 100) /
+      100;
     const finalPayableSSI = Math.min(payableSsi.toFixed(2), maxSSI);
 
-    setPayableSSI(finalPayableSSI);
+    setPayableSSI((Math.round(finalPayableSSI) * 100) / 100);
 
     // Apskaiciuota PSD ir moketina PSD
     const calcCHI = (Math.round(taxableIncome * 0.0698 * 100) / 100).toFixed(2);
-    const finalCalcCHI =
-      calcCHI < 703.56 ? 703.56 : calcCHI > 5057.06 ? 5057.06 : calcCHI;
+    // const finalCalcCHI =
+    if (calcCHI < 703.56) {
+      setCalcCHI(703.56);
+    } else if (calcCHI > 5057.06) {
+      setCalcCHI(5057.06);
+    } else {
+      setCalcCHI((Math.round(calcCHI * 100) / 100).toFixed(2));
+    }
 
-    setCalcCHI(finalCalcCHI);
+    setCalcCHI((Math.round(calcCHI * 100) / 100).toFixed(2));
 
-    const finalpayableChi = finalCalcCHI - paidCHI;
-    setPayableCHI(finalpayableChi);
+    const finalpayableChi = calcCHI - (paidCHI ? paidCHI : 0);
+    setPayableCHI((Math.round(finalpayableChi * 100) / 100).toFixed(2));
+
+    console.log(taxableIncome);
+    console.log(taxRate);
+    console.log(paidSSI);
+
+    console.log(payableSsi);
+    console.log(finalPayableSSI);
+    console.log(finalpayableChi);
 
     // Apmokestinamas pelnas
     const taxableProfit =
@@ -100,6 +113,7 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
         (Math.round((taxableProfit * 0.15 - 0) * 100) / 100).toFixed(2)
       );
     }
+
     setCheckboxValue(checkboxValue);
   }, [
     incomeReceived,
@@ -180,6 +194,7 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
   const handlePayableSSI = (e: ChangeEvent<HTMLInputElement>) => {
     const value = parseFloat(e.target.value);
     setPayableSSI(value);
+    console.log(value);
   };
 
   const handlePayableCHI = (e: ChangeEvent<HTMLInputElement>) => {
@@ -194,17 +209,20 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
   };
 
   return (
-    <>
+    <StyledWrapper>
       {radioValue === 0.3 ? (
         checkboxValue === 1 ? (
           <div>
-            <h1>PSD ĮMOKOS IR VSD ĮMOKOS:</h1>
-            <h1>INDIVIDUALIOS VEIKLOS APMOKESTINIMO APSKAIČIAVIMAI</h1>
+            <h1>Individualios veiklos sumų įvedimas:</h1>
             <StyledDivider></StyledDivider>
-            <div>
+            <StyledIputsWrapper>
               <div>
-                <label>Gautos pajamos</label>
+                <Label targetinput='income-received' size='18px'>
+                  Gautos pajamos
+                </Label>
                 <Input
+                  theme={theme}
+                  identifier='income-received'
                   type='number'
                   value={incomeReceived}
                   changeEvent={() => handleIncomeReceivedChange}
@@ -212,46 +230,62 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
               </div>
               <div>
                 <Input
+                  theme={theme}
                   type='radio'
                   identifier='radio-0.3'
                   value={0.3}
                   checked={radioValue === 0.3}
                   changeEvent={() => handleRadioValueChange(0.3)}
                 />
-                <label htmlFor='radio-0.3'>30% nuo pajamų</label>
+                <Label targetinput='radio-0.3' size='18px'>
+                  30% nuo pajamų
+                </Label>
               </div>
               <div>
                 <Input
+                  theme={theme}
                   type='radio'
                   identifier='radio-0'
                   value={0}
                   checked={radioValue === 0}
                   changeEvent={() => handleRadioValueChange(0)}
                 />
-                <label htmlFor='radio-0'>faktinės išlaidos</label>
+                <Label targetinput='radio-0' size='18px'>
+                  faktinės išlaidos
+                </Label>
               </div>
-
               <div>
-                <label>Patirtos sąnaudos</label>
+                <Label targetinput='expenses-value' size='18px'>
+                  Patirtos sąnaudos
+                </Label>
                 <Input
+                  theme={theme}
+                  identifier='expenses-value'
                   type='number'
                   value={expensesValue}
                   changeEvent={handleExpensesChange}
                   disabled
                 />
               </div>
-
               <div>
-                <label>Sumokėta VSD</label>
+                <Label targetinput='paid-SSI' size='18px'>
+                  Sumokėta VSD
+                </Label>
                 <Input
+                  theme={theme}
+                  identifier='paid-SSI'
                   type='number'
                   value={paidSSI}
                   changeEvent={handlePaidSSI}
                 />
               </div>
               <div>
-                <label>Sumokėta PSD</label>
+                <Label targetinput='paid-CHI' size='18px'>
+                  Sumokėta PSD
+                </Label>
                 <Input
+                  theme={theme}
+                  identifier='paid-CHI'
                   type='number'
                   value={paidCHI}
                   changeEvent={handlePaidCHI}
@@ -259,60 +293,89 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
               </div>
               <div>
                 <Input
+                  theme={theme}
+                  identifier='pansion'
                   type='checkbox'
                   value={checkboxValue}
                   changeEvent={handleCheckboxChenge}
                 />
-                <label>3% kaupiu pensijai</label>
+                <Label targetinput='pension' size='18px'>
+                  3% kaupiu pensijai
+                </Label>
               </div>
-            </div>
-            <div>
+            </StyledIputsWrapper>
+            <StyledOutputsWrapper>
+              <h1>PSD įmokos ir VSD įmokos:</h1>
+              <h1>Individualios veiklos apmokestinimo apskaičiavimai:</h1>
+              <StyledDivider></StyledDivider>
               <div>
-                <label>Pajamų suma:</label>
+                <Label targetinput='income-received' size='18px'>
+                  Pajamų suma:
+                </Label>
                 <Input
+                  theme={theme}
+                  identifier='income-received'
                   type='number'
                   value={incomeReceived}
                   changeEvent={handleIncomeReceivedChange}
                 />
               </div>
               <div>
-                <label>
+                <Label targetinput='taxable-income' size='18px'>
                   „Sodros“ įmokų bazė (suma nuo kurios skaičiuojamos VSD ir PSD
                   įmokos):
-                </label>
+                </Label>
                 <Input
+                  theme={theme}
+                  identifier='taxable-income'
                   type='number'
                   value={taxableIncome}
                   changeEvent={handleIncomeReceivedChange}
                 />
               </div>
               <div>
-                <label>Apskaičiuota VSD įmokų suma:</label>
+                <Label targetinput='calc-SSI' size='18px'>
+                  Apskaičiuota VSD įmokų suma:
+                </Label>
                 <Input
+                  theme={theme}
+                  identifier='calc-SSI'
                   type='number'
                   value={calcSSI}
                   changeEvent={() => handleCalcSSI}
                 />
               </div>
               <div>
-                <label>Apskaičiuota PSD įmokų suma:</label>
+                <Label targetinput='calc-CHI' size='18px'>
+                  Apskaičiuota PSD įmokų suma:
+                </Label>
                 <Input
+                  theme={theme}
+                  identifier='calc-CHI'
                   type='number'
                   value={calcCHI}
                   changeEvent={() => handleCalcCHI}
                 />
               </div>
               <div>
-                <label>Mokėtina VSDĮ suma:</label>
+                <Label targetinput='payable-SSI' size='18px'>
+                  Mokėtina VSDĮ suma:
+                </Label>
                 <Input
+                  theme={theme}
+                  identifier='payable-SSI'
                   type='number'
                   value={payableSSI}
                   changeEvent={handlePayableSSI}
                 />
               </div>
               <div>
-                <label>Mokėtina PSDĮ suma:</label>
+                <Label targetinput='payable-CHI' size='18px'>
+                  Mokėtina PSDĮ suma:
+                </Label>
                 <Input
+                  theme={theme}
+                  identifier='payable-CHI'
                   type='number'
                   value={payableCHI}
                   changeEvent={handlePayableCHI}
@@ -321,90 +384,118 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
               <div>GYVENTOJŲ PAJAMŲ MOKESTIS:</div>
               <StyledDivider></StyledDivider>
               <div>
-                <label>Individualios veiklos pajamų suma:</label>
+                <Label targetinput='income-received' size='18px'>
+                  Individualios veiklos pajamų suma:
+                </Label>
                 <Input
+                  theme={theme}
+                  identifier='income-received'
                   type='number'
                   value={incomeReceived}
                   changeEvent={handleIncomeReceivedChange}
                 />
               </div>
               <div>
-                <label>
+                <Label targetinput='taxable-profit' size='18px'>
                   Apmokestinamas pelnas, nuo kurio skaičiuojamas GPM:
-                </label>
+                </Label>
                 <Input
+                  theme={theme}
+                  identifier='taxable-profit'
                   type='number'
                   value={taxableProfit}
                   changeEvent={handleTaxableProfit}
                 />
               </div>
               <div>
-                <label>Apskaičiuota GPM suma ({procGPM}%):</label>
+                <Label targetinput='calc-PIT' size='18px'>
+                  Apskaičiuota GPM suma ({procGPM}%):
+                </Label>
                 <Input
+                  theme={theme}
+                  identifier='calc-PIT'
                   type='number'
                   value={calcPIT}
                   changeEvent={() => handleTaxableProfit}
                 />
               </div>
-            </div>
+            </StyledOutputsWrapper>
           </div>
         ) : (
           <div>
-            <h1>PSD ĮMOKOS IR VSD ĮMOKOS:</h1>
-            <h1>INDIVIDUALIOS VEIKLOS APMOKESTINIMO APSKAIČIAVIMAI</h1>
+            <h1>Individualios veiklos sumų įvedimas:</h1>
             <StyledDivider></StyledDivider>
-            <div>
+            <StyledIputsWrapper>
               <div>
-                <label>Gautos pajamos</label>
+                <Label targetinput='income-received' size='18px'>
+                  Gautos pajamos
+                </Label>
                 <Input
+                  theme={theme}
+                  identifier='income-received'
                   type='number'
                   value={incomeReceived}
-                  changeEvent={handleIncomeReceivedChange}
+                  changeEvent={() => handleIncomeReceivedChange}
                 />
               </div>
-
               <div>
                 <Input
+                  theme={theme}
                   type='radio'
                   identifier='radio-0.3'
                   value={0.3}
                   checked={radioValue === 0.3}
                   changeEvent={() => handleRadioValueChange(0.3)}
                 />
-                <label htmlFor='radio-0.3'>30% nuo pajamų</label>
+                <Label targetinput='radio-0.3' size='18px'>
+                  30% nuo pajamų
+                </Label>
               </div>
               <div>
                 <Input
+                  theme={theme}
                   type='radio'
                   identifier='radio-0'
                   value={0}
                   checked={radioValue === 0}
                   changeEvent={() => handleRadioValueChange(0)}
                 />
-                <label htmlFor='radio-0'>faktinės išlaidos</label>
+                <Label targetinput='radio-0' size='18px'>
+                  faktinės išlaidos
+                </Label>
               </div>
-
               <div>
-                <label>Patirtos sąnaudos</label>
+                <Label targetinput='expenses-value' size='18px'>
+                  Patirtos sąnaudos
+                </Label>
                 <Input
+                  theme={theme}
+                  identifier='expenses-value'
                   type='number'
                   value={expensesValue}
                   changeEvent={handleExpensesChange}
                   disabled
                 />
               </div>
-
               <div>
-                <label>Sumokėta VSD</label>
+                <Label targetinput='paid-SSI' size='18px'>
+                  Sumokėta VSD
+                </Label>
                 <Input
+                  theme={theme}
+                  identifier='paid-SSI'
                   type='number'
                   value={paidSSI}
                   changeEvent={handlePaidSSI}
                 />
               </div>
               <div>
-                <label>Sumokėta PSD</label>
+                <Label targetinput='paid-CHI' size='18px'>
+                  Sumokėta PSD
+                </Label>
                 <Input
+                  theme={theme}
+                  identifier='paid-CHI'
                   type='number'
                   value={paidCHI}
                   changeEvent={handlePaidCHI}
@@ -412,63 +503,89 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
               </div>
               <div>
                 <Input
+                  theme={theme}
+                  identifier='pansion'
                   type='checkbox'
                   value={checkboxValue}
                   changeEvent={handleCheckboxChenge}
                 />
-                <label>3% kaupiu pensijai</label>
+                <Label targetinput='pension' size='18px'>
+                  3% kaupiu pensijai
+                </Label>
               </div>
-            </div>
-            <div>
+            </StyledIputsWrapper>
+            <StyledOutputsWrapper>
+              <h1>PSD įmokos ir VSD įmokos:</h1>
+              <h1>Individualios veiklos apmokestinimo apskaičiavimai:</h1>
+              <StyledDivider></StyledDivider>
               <div>
-                <label>Pajamų suma:</label>
+                <Label targetinput='income-received' size='18px'>
+                  Pajamų suma:
+                </Label>
                 <Input
+                  theme={theme}
+                  identifier='income-received'
                   type='number'
                   value={incomeReceived}
-                  onChange={handleIncomeReceivedChange}
+                  changeEvent={handleIncomeReceivedChange}
                 />
               </div>
-
               <div>
-                <label>
+                <Label targetinput='taxable-income' size='18px'>
                   „Sodros“ įmokų bazė (suma nuo kurios skaičiuojamos VSD ir PSD
                   įmokos):
-                </label>
+                </Label>
                 <Input
+                  theme={theme}
+                  identifier='taxable-income'
                   type='number'
                   value={taxableIncome}
                   changeEvent={handleIncomeReceivedChange}
                 />
               </div>
-
               <div>
-                <label>Apskaičiuota VSD įmokų suma:</label>
+                <Label targetinput='calc-SSI' size='18px'>
+                  Apskaičiuota VSD įmokų suma:
+                </Label>
                 <Input
+                  theme={theme}
+                  identifier='calc-SSI'
                   type='number'
                   value={calcSSI}
-                  changeEvent={handleCalcSSI}
+                  changeEvent={() => handleCalcSSI}
                 />
               </div>
               <div>
-                <label>Apskaičiuota PSD įmokų suma:</label>
+                <Label targetinput='calc-CHI' size='18px'>
+                  Apskaičiuota PSD įmokų suma:
+                </Label>
                 <Input
+                  theme={theme}
+                  identifier='calc-CHI'
                   type='number'
                   value={calcCHI}
                   changeEvent={() => handleCalcCHI}
                 />
               </div>
-
               <div>
-                <label>Mokėtina VSDĮ suma:</label>
+                <Label targetinput='payable-SSI' size='18px'>
+                  Mokėtina VSDĮ suma:
+                </Label>
                 <Input
+                  theme={theme}
+                  identifier='payable-SSI'
                   type='number'
                   value={payableSSI}
                   changeEvent={handlePayableSSI}
                 />
               </div>
               <div>
-                <label>Mokėtina PSDĮ suma:</label>
+                <Label targetinput='payable-CHI' size='18px'>
+                  Mokėtina PSDĮ suma:
+                </Label>
                 <Input
+                  theme={theme}
+                  identifier='payable-CHI'
                   type='number'
                   value={payableCHI}
                   changeEvent={handlePayableCHI}
@@ -477,92 +594,118 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
               <div>GYVENTOJŲ PAJAMŲ MOKESTIS:</div>
               <StyledDivider></StyledDivider>
               <div>
-                <label>Individualios veiklos pajamų suma:</label>
+                <Label targetinput='income-received' size='18px'>
+                  Individualios veiklos pajamų suma:
+                </Label>
                 <Input
+                  theme={theme}
+                  identifier='income-received'
                   type='number'
                   value={incomeReceived}
                   changeEvent={handleIncomeReceivedChange}
                 />
               </div>
-
               <div>
-                <label>
+                <Label targetinput='taxable-profit' size='18px'>
                   Apmokestinamas pelnas, nuo kurio skaičiuojamas GPM:
-                </label>
+                </Label>
                 <Input
+                  theme={theme}
+                  identifier='taxable-profit'
                   type='number'
                   value={taxableProfit}
-                  changeEvent={handleIncomeReceivedChange}
+                  changeEvent={handleTaxableProfit}
                 />
               </div>
-
               <div>
-                <label>Apskaičiuota GPM suma ({procGPM}%):</label>
+                <Label targetinput='calc-PIT' size='18px'>
+                  Apskaičiuota GPM suma ({procGPM}%):
+                </Label>
                 <Input
+                  theme={theme}
+                  identifier='calc-PIT'
                   type='number'
                   value={calcPIT}
                   changeEvent={() => handleTaxableProfit}
                 />
               </div>
-            </div>
+            </StyledOutputsWrapper>
           </div>
         )
       ) : checkboxValue === 1 ? (
         <div>
-          <h1>PSD ĮMOKOS IR VSD ĮMOKOS:</h1>
-          <h1>INDIVIDUALIOS VEIKLOS APMOKESTINIMO APSKAIČIAVIMAI</h1>
+          <h1>Individualios veiklos sumų įvedimas:</h1>
           <StyledDivider></StyledDivider>
-          <div>
+          <StyledIputsWrapper>
             <div>
-              <label>Gautos pajamos</label>
+              <Label targetinput='income-received' size='18px'>
+                Gautos pajamos
+              </Label>
               <Input
+                theme={theme}
+                identifier='income-received'
                 type='number'
                 value={incomeReceived}
                 changeEvent={handleIncomeReceivedChange}
               />
             </div>
-
             <div>
               <Input
+                theme={theme}
                 type='radio'
                 identifier='radio-0.3'
                 value={0.3}
                 checked={radioValue === 0.3}
                 changeEvent={() => handleRadioValueChange(0.3)}
               />
-              <label htmlFor='radio-0.3'>30% nuo pajamų</label>
+              <Label targetinput='radio-0.3' size='18px'>
+                30% nuo pajamų
+              </Label>
             </div>
             <div>
               <Input
+                theme={theme}
                 type='radio'
                 identifier='radio-0'
                 value={0}
                 checked={radioValue === 0}
                 changeEvent={() => handleRadioValueChange(0)}
               />
-              <label htmlFor='radio-0'>faktinės išlaidos</label>
+              <Label targetinput='radio-0' size='18px'>
+                faktinės išlaidos
+              </Label>
             </div>
-
             <div>
-              <label>Patirtos sąnaudos</label>
+              <Label targetinput='expenses-value' size='18px'>
+                Patirtos sąnaudos
+              </Label>
               <Input
+                theme={theme}
+                identifier='expenses-value'
                 type='number'
                 value={expensesValue}
                 changeEvent={handleExpensesChange}
               />
             </div>
-
             <div>
-              <label>Sumokėta VSD</label>
+              <Label targetinput='paid-SSI' size='18px'>
+                Sumokėta VSD
+              </Label>
               <Input
+                theme={theme}
+                identifier='paid-SSI'
                 type='number'
                 value={paidSSI}
                 changeEvent={handlePaidSSI}
               />
             </div>
             <div>
-              <label>Sumokėta PSD</label>
+              <Label targetinput='paid-CHI' size='18px'>
+                Sumokėta PSD
+              </Label>
               <Input
+                theme={theme}
+                identifier='paid-CHI'
                 type='number'
                 value={paidCHI}
                 changeEvent={handlePaidCHI}
@@ -570,65 +713,89 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
             </div>
             <div>
               <Input
+                theme={theme}
+                identifier='pansion'
                 type='checkbox'
                 value={checkboxValue}
                 changeEvent={handleCheckboxChenge}
               />
-              <label>3% kaupiu pensijai</label>
+              <Label targetinput='pension' size='18px'>
+                3% kaupiu pensijai
+              </Label>
             </div>
-          </div>
-          <div>
+          </StyledIputsWrapper>
+          <StyledOutputsWrapper>
+            <h1>PSD ĮMOKOS IR VSD ĮMOKOS:</h1>
+            <h1>INDIVIDUALIOS VEIKLOS APMOKESTINIMO APSKAIČIAVIMAI</h1>
+            <StyledDivider></StyledDivider>
             <div>
-              <label>Pajamų suma:</label>
+              <Label targetinput='income-received' size='18px'>
+                Pajamų suma:
+              </Label>
               <Input
+                theme={theme}
+                identifier='income-received'
                 type='number'
                 value={incomeReceived}
                 onChange={handleIncomeReceivedChange}
               />
             </div>
-
             <div>
-              <label>
+              <Label targetinput='taxable-income' size='18px'>
                 „Sodros“ įmokų bazė (suma nuo kurios skaičiuojamos VSD ir PSD
                 įmokos):
-              </label>
+              </Label>
               <Input
+                theme={theme}
+                identifier='taxable-income'
                 type='number'
                 value={taxableIncome}
                 changeEvent={handleIncomeReceivedChange}
               />
             </div>
-
             <div>
-              <label>Apskaičiuota VSD įmokų suma:</label>
+              <Label targetinput='calc-SSI' size='18px'>
+                Apskaičiuota VSD įmokų suma:
+              </Label>
               <Input
+                theme={theme}
+                identifier='calc-SSI'
                 type='number'
                 value={calcSSI}
                 changeEvent={handleCalcSSI}
               />
             </div>
-
             <div>
-              <label>Apskaičiuota PSD įmokų suma:</label>
+              <Label targetinput='calc-CHI' size='18px'>
+                Apskaičiuota PSD įmokų suma:
+              </Label>
               <Input
+                theme={theme}
+                identifier='calc-CHI'
                 type='number'
                 value={calcCHI}
                 changeEvent={() => handleCalcCHI}
               />
             </div>
-
             <div>
-              <label>Mokėtina VSDĮ suma:</label>
+              <Label targetinput='payable-SSI' size='18px'>
+                Mokėtina VSDĮ suma:
+              </Label>
               <Input
+                theme={theme}
+                identifier='payable-SSI'
                 type='number'
                 value={payableSSI}
                 changeEvent={handlePayableSSI}
               />
             </div>
-
             <div>
-              <label>Mokėtina PSDĮ suma:</label>
+              <Label targetinput='payable-CHI' size='18px'>
+                Mokėtina PSDĮ suma:
+              </Label>
               <Input
+                theme={theme}
+                identifier='payable-CHI'
                 type='number'
                 value={payableCHI}
                 changeEvent={handlePayableCHI}
@@ -637,89 +804,117 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
             <div>GYVENTOJŲ PAJAMŲ MOKESTIS:</div>
             <StyledDivider></StyledDivider>
             <div>
-              <label>Individualios veiklos pajamų suma:</label>
+              <Label targetinput='income-received' size='18px'>
+                Individualios veiklos pajamų suma:
+              </Label>
               <Input
+                theme={theme}
+                identifier='income-received'
                 type='number'
                 value={incomeReceived}
                 changeEvent={handleIncomeReceivedChange}
               />
             </div>
-
             <div>
-              <label>Apmokestinamas pelnas, nuo kurio skaičiuojamas GPM:</label>
+              <Label targetinput='taxable-profit' size='18px'>
+                Apmokestinamas pelnas, nuo kurio skaičiuojamas GPM:
+              </Label>
               <Input
+                theme={theme}
+                identifier='taxable-profit'
                 type='number'
                 value={taxableProfit}
-                changeEvent={handleIncomeReceivedChange}
+                changeEvent={handleTaxableProfit}
               />
             </div>
-
             <div>
-              <label>Apskaičiuota GPM suma ({procGPM}%):</label>
+              <Label targetinput='calc-PIT' size='18px'>
+                Apskaičiuota GPM suma ({procGPM}%):
+              </Label>
               <Input
+                theme={theme}
+                identifier='calc-PIT'
                 type='number'
                 value={calcPIT}
                 changeEvent={() => handleTaxableProfit}
               />
             </div>
-          </div>
+          </StyledOutputsWrapper>
         </div>
       ) : (
         <div>
-          <h1>PSD ĮMOKOS IR VSD ĮMOKOS:</h1>
-          <h1>INDIVIDUALIOS VEIKLOS APMOKESTINIMO APSKAIČIAVIMAI</h1>
+          <h1>Individualios veiklos sumų įvedimas:</h1>
           <StyledDivider></StyledDivider>
-          <div>
+          <StyledIputsWrapper>
             <div>
-              <label>Gautos pajamos</label>
+              <Label targetinput='income-received' size='18px'>
+                Gautos pajamos
+              </Label>
               <Input
+                theme={theme}
+                identifier='income-received'
                 type='number'
                 value={incomeReceived}
                 changeEvent={handleIncomeReceivedChange}
               />
             </div>
-
             <div>
               <Input
+                theme={theme}
                 type='radio'
                 identifier='radio-0.3'
                 value={0.3}
                 checked={radioValue === 0.3}
                 changeEvent={() => handleRadioValueChange(0.3)}
               />
-              <label htmlFor='radio-0.3'>30% nuo pajamų</label>
+              <Label targetinput='radio-0.3' size='18px'>
+                30% nuo pajamų
+              </Label>
             </div>
             <div>
               <Input
+                theme={theme}
                 type='radio'
                 identifier='radio-0'
                 value={0}
                 checked={radioValue === 0}
                 changeEvent={() => handleRadioValueChange(0)}
               />
-              <label htmlFor='radio-0'>faktinės išlaidos</label>
+              <Label targetinput='radio-0' size='18px'>
+                faktinės išlaidos
+              </Label>
             </div>
-
             <div>
-              <label>Patirtos sąnaudos</label>
+              <Label targetinput='expenses-value' size='18px'>
+                Patirtos sąnaudos
+              </Label>
               <Input
+                theme={theme}
+                identifier='expenses-value'
                 type='number'
                 value={expensesValue}
                 changeEvent={handleExpensesChange}
               />
             </div>
-
             <div>
-              <label>Sumokėta VSD</label>
+              <Label targetinput='paid-SSI' size='18px'>
+                Sumokėta VSD
+              </Label>
               <Input
+                theme={theme}
+                identifier='paid-SSI'
                 type='number'
                 value={paidSSI}
                 changeEvent={handlePaidSSI}
               />
             </div>
             <div>
-              <label>Sumokėta PSD</label>
+              <Label targetinput='paid-CHI' size='18px'>
+                Sumokėta PSD
+              </Label>
               <Input
+                theme={theme}
+                identifier='paid-CHI'
                 type='number'
                 value={paidCHI}
                 changeEvent={handlePaidCHI}
@@ -727,65 +922,89 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
             </div>
             <div>
               <Input
+                theme={theme}
+                identifier='pansion'
                 type='checkbox'
                 value={checkboxValue}
                 changeEvent={handleCheckboxChenge}
               />
-              <label>3% kaupiu pensijai</label>
+              <Label targetinput='pension' size='18px'>
+                3% kaupiu pensijai
+              </Label>
             </div>
-          </div>
-          <div>
+          </StyledIputsWrapper>
+          <StyledOutputsWrapper>
+            <h1>PSD ĮMOKOS IR VSD ĮMOKOS:</h1>
+            <h1>INDIVIDUALIOS VEIKLOS APMOKESTINIMO APSKAIČIAVIMAI</h1>
+            <StyledDivider></StyledDivider>
             <div>
-              <label>Pajamų suma:</label>
+              <Label targetinput='income-received' size='18px'>
+                Pajamų suma:
+              </Label>
               <Input
+                theme={theme}
+                identifier='income-received'
                 type='number'
                 value={incomeReceived}
                 onChange={handleIncomeReceivedChange}
               />
             </div>
-
             <div>
-              <label>
+              <Label targetinput='taxable-income' size='18px'>
                 „Sodros“ įmokų bazė (suma nuo kurios skaičiuojamos VSD ir PSD
                 įmokos):
-              </label>
+              </Label>
               <Input
+                theme={theme}
+                identifier='taxable-income'
                 type='number'
                 value={taxableIncome}
                 changeEvent={handleIncomeReceivedChange}
               />
             </div>
-
             <div>
-              <label>Apskaičiuota VSD įmokų suma:</label>
+              <Label targetinput='calc-SSI' size='18px'>
+                Apskaičiuota VSD įmokų suma:
+              </Label>
               <Input
+                theme={theme}
+                identifier='calc-SSI'
                 type='number'
                 value={calcSSI}
                 changeEvent={handleCalcSSI}
               />
             </div>
-
             <div>
-              <label>Apskaičiuota PSD įmokų suma:</label>
+              <Label targetinput='calc-CHI' size='18px'>
+                Apskaičiuota PSD įmokų suma:
+              </Label>
               <Input
+                theme={theme}
+                identifier='calc-CHI'
                 type='number'
                 value={calcCHI}
                 changeEvent={() => handleCalcCHI}
               />
             </div>
-
             <div>
-              <label>Mokėtina VSDĮ suma:</label>
+              <Label targetinput='payable-SSI' size='18px'>
+                Mokėtina VSDĮ suma:
+              </Label>
               <Input
+                theme={theme}
+                identifier='payable-SSI'
                 type='number'
                 value={payableSSI}
                 changeEvent={handlePayableSSI}
               />
             </div>
-
             <div>
-              <label>Mokėtina PSDĮ suma:</label>
+              <Label targetinput='payable-CHI' size='18px'>
+                Mokėtina PSDĮ suma:
+              </Label>
               <Input
+                theme={theme}
+                identifier='payable-CHI'
                 type='number'
                 value={payableCHI}
                 changeEvent={handlePayableCHI}
@@ -794,35 +1013,45 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
             <div>GYVENTOJŲ PAJAMŲ MOKESTIS:</div>
             <StyledDivider></StyledDivider>
             <div>
-              <label>Individualios veiklos pajamų suma:</label>
+              <Label targetinput='income-received' size='18px'>
+                Individualios veiklos pajamų suma:
+              </Label>
               <Input
+                theme={theme}
+                identifier='income-received'
                 type='number'
                 value={incomeReceived}
                 changeEvent={handleIncomeReceivedChange}
               />
             </div>
-
             <div>
-              <label>Apmokestinamas pelnas, nuo kurio skaičiuojamas GPM:</label>
+              <Label targetinput='taxable-profit' size='18px'>
+                Apmokestinamas pelnas, nuo kurio skaičiuojamas GPM:
+              </Label>
               <Input
+                theme={theme}
+                identifier='taxable-profit'
                 type='number'
                 value={taxableProfit}
-                changeEvent={handleIncomeReceivedChange}
+                changeEvent={handleTaxableProfit}
               />
             </div>
-
             <div>
-              <label>Apskaičiuota GPM suma ({procGPM}%):</label>
+              <Label targetinput='calc-PIT' size='18px'>
+                Apskaičiuota GPM suma ({procGPM}%):
+              </Label>
               <Input
+                theme={theme}
+                identifier='calc-PIT'
                 type='number'
                 value={calcPIT}
                 changeEvent={() => handleTaxableProfit}
               />
             </div>
-          </div>
+          </StyledOutputsWrapper>
         </div>
       )}
-    </>
+    </StyledWrapper>
   );
 };
 
