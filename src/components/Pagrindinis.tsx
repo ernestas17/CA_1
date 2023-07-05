@@ -1,11 +1,15 @@
-import { Outlet } from 'react-router-dom';
+import { StyledMain } from './Pages/styles';
+import { LINK_LIST } from '../shared/link_list';
 
-const Pagrindinis = () => {
+import { IPageProps } from './Pages/types';
+
+import CardsContainer from './organisms/CardsContainer';
+
+const Pagrindinis = ({ layoutbreakpoint }: IPageProps) => {
     return (
-        <main>
-            <Outlet />
-            <h2>Pagrindinis</h2>
-        </main>
+        <StyledMain style={{ maxWidth: '1600px', justifyContent: 'center', alignItems: 'center' }} layoutbreakpoint={layoutbreakpoint}>
+            <CardsContainer carddata={LINK_LIST} />
+        </StyledMain>
     );
 };
 
