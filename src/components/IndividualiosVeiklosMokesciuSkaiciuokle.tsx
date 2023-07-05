@@ -29,78 +29,110 @@ const IndividualiosVeiklosMokesciuSkaiciuokle = ({
   const [calcPIT, setCalcPIT] = useState<number>(0);
 
   useEffect(() => {
-    const calckSSI =
-      checkboxValue === 1
-        ? (
-            Math.round(
-              (incomeReceived - incomeReceived * 0.3) * 0.9 * 0.1552 * 100
-            ) / 100
-          ).toFixed(2) > 11244.35
-          ? 11244.35
-          : (
-              Math.round(
-                (incomeReceived - incomeReceived * 0.3) * 0.9 * 0.1552 * 100
-              ) / 100
-            ).toFixed(2)
-        : (
-            Math.round(
-              (incomeReceived - incomeReceived * 0.3) * 0.9 * 0.1252 * 100
-            ) / 100
-          ).toFixed(2) > 9070.83
-        ? 9070.83
-        : (
-            Math.round(
-              (incomeReceived - incomeReceived * 0.3) * 0.9 * 0.1252 * 100
-            ) / 100
-          ).toFixed(2);
+    // Patirtos sanaudos
+    const expenses =
+      radioValue === 0.3 ? (incomeReceived ?? 0) * 0.3 : expensesValue ?? '';
+    setExpensesValue(expenses);
 
-    const calcCHI = (
-      Math.round((incomeReceived - incomeReceived * 0.3) * 0.9 * 0.0698 * 100) /
-      100
-    ).toFixed(2);
+    // Apmokestinamos pajamos
+    const taxableIncome = (incomeReceived - expenses) * 0.9;
+    setTaxableIncome((Math.round(taxableIncome * 100) / 100).toFixed(2));
+    // Apskaiciuota VSD ir moketina VSD
 
+    const taxRate = checkboxValue === 1 ? 0.1552 : 0.1252;
+    const maxSSI = checkboxValue === 1 ? 11244.35 : 9070.83;
+    const calculatedSSI = Math.round(taxableIncome * taxRate * 100) / 100;
+    const finalSSI = Math.min(calculatedSSI.toFixed(2), maxSSI);
+    setCalcSSI(finalSSI);
+
+    const payableSsi =
+      Math.round((taxableIncome * taxRate - paidSSI) * 100) / 100;
+    const finalPayableSSI = Math.min(payableSsi.toFixed(2), maxSSI);
+
+    setPayableSSI(finalPayableSSI);
+
+    // Apskaiciuota PSD ir moketina PSD
+    const calcCHI = (Math.round(taxableIncome * 0.0698 * 100) / 100).toFixed(2);
     const finalCalcCHI =
       calcCHI < 703.56 ? 703.56 : calcCHI > 5057.06 ? 5057.06 : calcCHI;
 
-    const taxableProfit =
-      radioValue === 0.3
-        ? incomeReceived - incomeReceived * 0.3
-        : incomeReceived - expensesValue - payableSSI - payableCHI;
-    setCheckboxValue(checkboxValue);
-    setCalcSSI(calckSSI);
     setCalcCHI(finalCalcCHI);
 
+    const finalpayableChi = finalCalcCHI - paidCHI;
+    setPayableCHI(finalpayableChi);
+
+    // Apmokestinamas pelnas
+    const taxableProfit =
+      radioValue === 0.3
+        ? (Math.round((incomeReceived - expenses) * 100) / 100).toFixed(2)
+        : (
+            Math.round(
+              (incomeReceived - expenses - payableSSI - payableCHI) * 100
+            ) / 100
+          ).toFixed(2);
+    setTaxableProfit(taxableProfit);
+    // Apskaiciuotas GPM
+
     if (taxableProfit <= 20000) {
-      setCalcPIT(taxableProfit * 0.15 - taxableProfit * 0.1);
+      setCalcPIT(
+        (
+          Math.round((taxableProfit * 0.15 - taxableProfit * 0.1) * 100) / 100
+        ).toFixed(2)
+      );
     } else if (taxableProfit > 20000 && taxableProfit < 35000) {
       setCalcPIT(
-        taxableProfit * 0.15 -
-          taxableProfit * (0.1 - (2 / 300000) * (taxableProfit - 20000))
+        (
+          Math.round(
+            (taxableProfit * 0.15 -
+              taxableProfit * (0.1 - (2 / 300000) * (taxableProfit - 20000))) *
+              100
+          ) / 100
+        ).toFixed(2)
       );
     } else {
-      setCalcPIT(taxableProfit * 0.15 - 0);
+      setCalcPIT(
+        (Math.round((taxableProfit * 0.15 - 0) * 100) / 100).toFixed(2)
+      );
     }
-  }, [incomeReceived]);
-
+    setCheckboxValue(checkboxValue);
+  }, [
+    incomeReceived,
+    radioValue,
+    expensesValue,
+    paidSSI,
+    paidCHI,
+    checkboxValue,
+    taxableIncome,
+    calcSSI,
+    calcCHI,
+    payableSSI,
+    payableCHI,
+    taxableProfit,
+    calcPIT,
+  ]);
+  const procGPM = (
+    Math.round(((calcPIT * 100) / taxableProfit) * 100) / 100
+  ).toFixed(2);
   const handleIncomeReceivedChange = (event: ChangeEvent<HTMLInputElement>) => {
     const inputValue = parseFloat(event.target.value);
     setIncomeReceived(inputValue);
   };
 
   const handleRadioValueChange = (value: number) => {
-    if (value === 0.3) {
-      setRadioValue(value);
-      setExpensesValue(expensesValue);
-      setTaxableIncome(taxableIncome);
-      setCalcSSI(calcSSI);
-      setCalcCHI(calcCHI);
-    } else {
-      setRadioValue(value);
-      setExpensesValue(expensesValue);
-      setTaxableIncome(taxableIncome);
-      setCalcSSI(calcSSI);
-      setCalcCHI(calcCHI);
-    }
+    setRadioValue(value);
+    // if (value === 0.3) {
+    //   setRadioValue(value);
+    //   setExpensesValue(expensesValue);
+    //   setTaxableIncome(taxableIncome);
+    //   setCalcSSI(calcSSI);
+    //   setCalcCHI(calcCHI);
+    // } else {
+    //   setRadioValue(value);
+    //   setExpensesValue(expensesValue);
+    //   setTaxableIncome(taxableIncome);
+    //   setCalcSSI(calcSSI);
+    //   setCalcCHI(calcCHI);
+    // }
   };
 
   const handleExpensesChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -118,14 +150,13 @@ const IndividualiosVeiklosMokesciuSkaiciuokle = ({
   const handleCheckboxChenge = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.checked ? 1 : 0;
 
-    if (value === 1) {
-      setCalcSSI(calcSSI);
-      setPayableSSI(payableSSI);
-    } else {
-      setCalcSSI(calcSSI);
-      setPayableSSI(payableSSI);
-    }
-
+    // if (value === 1) {
+    //   setCalcSSI(calcSSI);
+    //   setPayableSSI(payableSSI);
+    // } else {
+    //   setCalcSSI(calcSSI);
+    //   setPayableSSI(payableSSI);
+    // }
     setCheckboxValue(value);
   };
 
@@ -146,9 +177,9 @@ const IndividualiosVeiklosMokesciuSkaiciuokle = ({
   };
 
   const handlePayableCHI = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = parseFloat(e.target.value);
+    // const value = parseFloat(e.target.value);
     // const payableChiValue = value < 703.56 ? 703.56 : value;
-    setPayableCHI(value);
+    // setPayableCHI(value);
   };
 
   const handleTaxableProfit = (value: number) => {
@@ -171,12 +202,12 @@ const IndividualiosVeiklosMokesciuSkaiciuokle = ({
               <StyledDivider></StyledDivider>
               <div>
                 <div>
+                  <label>Gautos pajamos</label>
                   <Input
                     type='number'
                     value={incomeReceived}
-                    changeEvent={handleIncomeReceivedChange}
+                    changeEvent={() => handleIncomeReceivedChange}
                   />
-                  <label>Gautos pajamos</label>
                 </div>
                 <div>
                   <Input
@@ -203,7 +234,7 @@ const IndividualiosVeiklosMokesciuSkaiciuokle = ({
                   <label>Patirtos sąnaudos</label>
                   <Input
                     type='number'
-                    value={(incomeReceived ?? 0) * 0.3}
+                    value={expensesValue}
                     changeEvent={handleExpensesChange}
                     disabled
                   />
@@ -240,7 +271,7 @@ const IndividualiosVeiklosMokesciuSkaiciuokle = ({
                   <Input
                     type='number'
                     value={incomeReceived}
-                    onChange={handleIncomeReceivedChange}
+                    changeEvent={handleIncomeReceivedChange}
                   />
                 </div>
                 <div>
@@ -250,8 +281,8 @@ const IndividualiosVeiklosMokesciuSkaiciuokle = ({
                   </label>
                   <Input
                     type='number'
-                    value={(incomeReceived - incomeReceived * 0.3) * 0.9}
-                    onChange={handleIncomeReceivedChange}
+                    value={taxableIncome}
+                    changeEvent={handleIncomeReceivedChange}
                   />
                 </div>
                 <div>
@@ -274,27 +305,7 @@ const IndividualiosVeiklosMokesciuSkaiciuokle = ({
                   <label>Mokėtina VSDĮ suma:</label>
                   <Input
                     type='number'
-                    value={
-                      (
-                        Math.round(
-                          ((incomeReceived - incomeReceived * 0.3) *
-                            0.9 *
-                            0.1552 -
-                            paidSSI) *
-                            100
-                        ) / 100
-                      ).toFixed(2) > 11244.35
-                        ? 11244.35
-                        : (
-                            Math.round(
-                              ((incomeReceived - incomeReceived * 0.3) *
-                                0.9 *
-                                0.1552 -
-                                paidSSI) *
-                                100
-                            ) / 100
-                          ).toFixed(2)
-                    }
+                    value={payableSSI}
                     changeEvent={handlePayableSSI}
                   />
                 </div>
@@ -302,27 +313,7 @@ const IndividualiosVeiklosMokesciuSkaiciuokle = ({
                   <label>Mokėtina PSDĮ suma:</label>
                   <Input
                     type='number'
-                    value={
-                      (
-                        Math.round(
-                          ((incomeReceived - incomeReceived * 0.3) *
-                            0.9 *
-                            0.0698 -
-                            paidCHI) *
-                            100
-                        ) / 100
-                      ).toFixed(2) < 703.56
-                        ? 703.56
-                        : (
-                            Math.round(
-                              ((incomeReceived - incomeReceived * 0.3) *
-                                0.9 *
-                                0.0698 -
-                                paidCHI) *
-                                100
-                            ) / 100
-                          ).toFixed(2)
-                    }
+                    value={payableCHI}
                     changeEvent={handlePayableCHI}
                   />
                 </div>
@@ -342,16 +333,12 @@ const IndividualiosVeiklosMokesciuSkaiciuokle = ({
                   </label>
                   <Input
                     type='number'
-                    value={(
-                      Math.round(
-                        (incomeReceived - incomeReceived * 0.3) * 100
-                      ) / 100
-                    ).toFixed(2)}
-                    changeEvent={() => handleTaxableProfit}
+                    value={taxableProfit}
+                    changeEvent={handleTaxableProfit}
                   />
                 </div>
                 <div>
-                  <label>Apskaičiuota GPM suma (`${}`):</label>
+                  <label>Apskaičiuota GPM suma ({procGPM}%):</label>
                   <Input
                     type='number'
                     value={calcPIT}
@@ -367,12 +354,12 @@ const IndividualiosVeiklosMokesciuSkaiciuokle = ({
               <StyledDivider></StyledDivider>
               <div>
                 <div>
+                  <label>Gautos pajamos</label>
                   <Input
                     type='number'
                     value={incomeReceived}
                     changeEvent={handleIncomeReceivedChange}
                   />
-                  <label>Gautos pajamos</label>
                 </div>
 
                 <div>
@@ -400,7 +387,7 @@ const IndividualiosVeiklosMokesciuSkaiciuokle = ({
                   <label>Patirtos sąnaudos</label>
                   <Input
                     type='number'
-                    value={(incomeReceived ?? 0) * 0.3}
+                    value={expensesValue}
                     changeEvent={handleExpensesChange}
                     disabled
                   />
@@ -448,8 +435,8 @@ const IndividualiosVeiklosMokesciuSkaiciuokle = ({
                   </label>
                   <Input
                     type='number'
-                    value={(incomeReceived - incomeReceived * 0.3) * 0.9}
-                    onChange={handleIncomeReceivedChange}
+                    value={taxableIncome}
+                    changeEvent={handleIncomeReceivedChange}
                   />
                 </div>
 
@@ -457,25 +444,7 @@ const IndividualiosVeiklosMokesciuSkaiciuokle = ({
                   <label>Apskaičiuota VSD įmokų suma:</label>
                   <Input
                     type='number'
-                    value={
-                      (
-                        Math.round(
-                          (incomeReceived - incomeReceived * 0.3) *
-                            0.9 *
-                            0.1252 *
-                            100
-                        ) / 100
-                      ).toFixed(2) > 9070.83
-                        ? 9070.83
-                        : (
-                            Math.round(
-                              (incomeReceived - incomeReceived * 0.3) *
-                                0.9 *
-                                0.1252 *
-                                100
-                            ) / 100
-                          ).toFixed(2)
-                    }
+                    value={calcSSI}
                     changeEvent={handleCalcSSI}
                   />
                 </div>
@@ -483,26 +452,8 @@ const IndividualiosVeiklosMokesciuSkaiciuokle = ({
                   <label>Apskaičiuota PSD įmokų suma:</label>
                   <Input
                     type='number'
-                    value={
-                      (
-                        Math.round(
-                          (incomeReceived - incomeReceived * 0.3) *
-                            0.9 *
-                            0.0698 *
-                            100
-                        ) / 100
-                      ).toFixed(2) < 703.56
-                        ? 703.56
-                        : (
-                            Math.round(
-                              (incomeReceived - incomeReceived * 0.3) *
-                                0.9 *
-                                0.0698 *
-                                100
-                            ) / 100
-                          ).toFixed(2)
-                    }
-                    changeEvent={handleCalcCHI}
+                    value={calcCHI}
+                    changeEvent={() => handleCalcCHI}
                   />
                 </div>
 
@@ -510,27 +461,7 @@ const IndividualiosVeiklosMokesciuSkaiciuokle = ({
                   <label>Mokėtina VSDĮ suma:</label>
                   <Input
                     type='number'
-                    value={
-                      (
-                        Math.round(
-                          ((incomeReceived - incomeReceived * 0.3) *
-                            0.9 *
-                            0.1252 -
-                            paidSSI) *
-                            100
-                        ) / 100
-                      ).toFixed(2) > 9070.83
-                        ? 9070.83
-                        : (
-                            Math.round(
-                              ((incomeReceived - incomeReceived * 0.3) *
-                                0.9 *
-                                0.1252 -
-                                paidSSI) *
-                                100
-                            ) / 100
-                          ).toFixed(2)
-                    }
+                    value={payableSSI}
                     changeEvent={handlePayableSSI}
                   />
                 </div>
@@ -538,27 +469,7 @@ const IndividualiosVeiklosMokesciuSkaiciuokle = ({
                   <label>Mokėtina PSDĮ suma:</label>
                   <Input
                     type='number'
-                    value={
-                      (
-                        Math.round(
-                          ((incomeReceived - incomeReceived * 0.3) *
-                            0.9 *
-                            0.0698 -
-                            paidCHI) *
-                            100
-                        ) / 100
-                      ).toFixed(2) < 703.56
-                        ? 703.56
-                        : (
-                            Math.round(
-                              ((incomeReceived - incomeReceived * 0.3) *
-                                0.9 *
-                                0.0698 -
-                                paidCHI) *
-                                100
-                            ) / 100
-                          ).toFixed(2)
-                    }
+                    value={payableCHI}
                     changeEvent={handlePayableCHI}
                   />
                 </div>
@@ -579,17 +490,13 @@ const IndividualiosVeiklosMokesciuSkaiciuokle = ({
                   </label>
                   <Input
                     type='number'
-                    value={(
-                      Math.round(
-                        (incomeReceived - incomeReceived * 0.3) * 100
-                      ) / 100
-                    ).toFixed(2)}
+                    value={taxableProfit}
                     changeEvent={handleIncomeReceivedChange}
                   />
                 </div>
 
                 <div>
-                  <label>Apskaičiuota GPM suma (`${}`):</label>
+                  <label>Apskaičiuota GPM suma ({procGPM}%):</label>
                   <Input
                     type='number'
                     value={calcPIT}
@@ -606,12 +513,12 @@ const IndividualiosVeiklosMokesciuSkaiciuokle = ({
             <StyledDivider></StyledDivider>
             <div>
               <div>
+                <label>Gautos pajamos</label>
                 <Input
                   type='number'
                   value={incomeReceived}
                   changeEvent={handleIncomeReceivedChange}
                 />
-                <label>Gautos pajamos</label>
               </div>
 
               <div>
@@ -639,7 +546,7 @@ const IndividualiosVeiklosMokesciuSkaiciuokle = ({
                 <label>Patirtos sąnaudos</label>
                 <Input
                   type='number'
-                  value={expensesValue ?? ''}
+                  value={expensesValue}
                   changeEvent={handleExpensesChange}
                 />
               </div>
@@ -686,12 +593,8 @@ const IndividualiosVeiklosMokesciuSkaiciuokle = ({
                 </label>
                 <Input
                   type='number'
-                  value={(
-                    Math.round(
-                      (incomeReceived - (expensesValue ?? 0)) * 0.9 * 100
-                    ) / 100
-                  ).toFixed(2)}
-                  onChange={handleIncomeReceivedChange}
+                  value={taxableIncome}
+                  changeEvent={handleIncomeReceivedChange}
                 />
               </div>
 
@@ -699,22 +602,7 @@ const IndividualiosVeiklosMokesciuSkaiciuokle = ({
                 <label>Apskaičiuota VSD įmokų suma:</label>
                 <Input
                   type='number'
-                  value={
-                    (
-                      Math.round(
-                        (incomeReceived - expensesValue) * 0.9 * 0.1552 * 100
-                      ) / 100
-                    ).toFixed(2) > 11244.35
-                      ? 11244.35
-                      : (
-                          Math.round(
-                            (incomeReceived - expensesValue) *
-                              0.9 *
-                              0.1552 *
-                              100
-                          ) / 100
-                        ).toFixed(2)
-                  }
+                  value={calcSSI}
                   changeEvent={handleCalcSSI}
                 />
               </div>
@@ -723,23 +611,8 @@ const IndividualiosVeiklosMokesciuSkaiciuokle = ({
                 <label>Apskaičiuota PSD įmokų suma:</label>
                 <Input
                   type='number'
-                  value={
-                    (
-                      Math.round(
-                        (incomeReceived - expensesValue) * 0.9 * 0.0698 * 100
-                      ) / 100
-                    ).toFixed(2) < 703.56
-                      ? 703.56
-                      : (
-                          Math.round(
-                            (incomeReceived - expensesValue) *
-                              0.9 *
-                              0.0698 *
-                              100
-                          ) / 100
-                        ).toFixed(2)
-                  }
-                  changeEvent={handleCalcCHI}
+                  value={calcCHI}
+                  changeEvent={() => handleCalcCHI}
                 />
               </div>
 
@@ -747,23 +620,7 @@ const IndividualiosVeiklosMokesciuSkaiciuokle = ({
                 <label>Mokėtina VSDĮ suma:</label>
                 <Input
                   type='number'
-                  value={
-                    (
-                      Math.round(
-                        ((incomeReceived - expensesValue) * 0.9 * 0.1552 -
-                          paidSSI) *
-                          100
-                      ) / 100
-                    ).toFixed(2) > 11244.35
-                      ? 11244.35
-                      : (
-                          Math.round(
-                            ((incomeReceived - expensesValue) * 0.9 * 0.1552 -
-                              paidSSI) *
-                              100
-                          ) / 100
-                        ).toFixed(2)
-                  }
+                  value={payableSSI}
                   changeEvent={handlePayableSSI}
                 />
               </div>
@@ -772,23 +629,7 @@ const IndividualiosVeiklosMokesciuSkaiciuokle = ({
                 <label>Mokėtina PSDĮ suma:</label>
                 <Input
                   type='number'
-                  value={
-                    (
-                      Math.round(
-                        ((incomeReceived - expensesValue) * 0.9 * 0.0698 -
-                          paidCHI) *
-                          100
-                      ) / 100
-                    ).toFixed(2) < 703.56
-                      ? 703.56
-                      : (
-                          Math.round(
-                            ((incomeReceived - expensesValue) * 0.9 * 0.0698 -
-                              paidCHI) *
-                              100
-                          ) / 100
-                        ).toFixed(2)
-                  }
+                  value={payableCHI}
                   changeEvent={handlePayableCHI}
                 />
               </div>
@@ -809,15 +650,13 @@ const IndividualiosVeiklosMokesciuSkaiciuokle = ({
                 </label>
                 <Input
                   type='number'
-                  value={(
-                    Math.round((incomeReceived - expensesValue) * 100) / 100
-                  ).toFixed(2)}
+                  value={taxableProfit}
                   changeEvent={handleIncomeReceivedChange}
                 />
               </div>
 
               <div>
-                <label>Apskaičiuota GPM suma (`${}`):</label>
+                <label>Apskaičiuota GPM suma ({procGPM}%):</label>
                 <Input
                   type='number'
                   value={calcPIT}
@@ -833,12 +672,12 @@ const IndividualiosVeiklosMokesciuSkaiciuokle = ({
             <StyledDivider></StyledDivider>
             <div>
               <div>
+                <label>Gautos pajamos</label>
                 <Input
                   type='number'
                   value={incomeReceived}
                   changeEvent={handleIncomeReceivedChange}
                 />
-                <label>Gautos pajamos</label>
               </div>
 
               <div>
@@ -866,7 +705,7 @@ const IndividualiosVeiklosMokesciuSkaiciuokle = ({
                 <label>Patirtos sąnaudos</label>
                 <Input
                   type='number'
-                  value={expensesValue ?? ''}
+                  value={expensesValue}
                   changeEvent={handleExpensesChange}
                 />
               </div>
@@ -913,12 +752,8 @@ const IndividualiosVeiklosMokesciuSkaiciuokle = ({
                 </label>
                 <Input
                   type='number'
-                  value={(
-                    Math.round(
-                      (incomeReceived - (expensesValue ?? 0)) * 0.9 * 100
-                    ) / 100
-                  ).toFixed(2)}
-                  onChange={handleIncomeReceivedChange}
+                  value={taxableIncome}
+                  changeEvent={handleIncomeReceivedChange}
                 />
               </div>
 
@@ -926,22 +761,7 @@ const IndividualiosVeiklosMokesciuSkaiciuokle = ({
                 <label>Apskaičiuota VSD įmokų suma:</label>
                 <Input
                   type='number'
-                  value={
-                    (
-                      Math.round(
-                        (incomeReceived - expensesValue) * 0.9 * 0.1252 * 100
-                      ) / 100
-                    ).toFixed(2) > 9070.83
-                      ? 9070.83
-                      : (
-                          Math.round(
-                            (incomeReceived - expensesValue) *
-                              0.9 *
-                              0.1252 *
-                              100
-                          ) / 100
-                        ).toFixed(2)
-                  }
+                  value={calcSSI}
                   changeEvent={handleCalcSSI}
                 />
               </div>
@@ -950,23 +770,8 @@ const IndividualiosVeiklosMokesciuSkaiciuokle = ({
                 <label>Apskaičiuota PSD įmokų suma:</label>
                 <Input
                   type='number'
-                  value={
-                    (
-                      Math.round(
-                        (incomeReceived - expensesValue) * 0.9 * 0.0698 * 100
-                      ) / 100
-                    ).toFixed(2) < 703.56
-                      ? 703.56
-                      : (
-                          Math.round(
-                            (incomeReceived - expensesValue) *
-                              0.9 *
-                              0.0698 *
-                              100
-                          ) / 100
-                        ).toFixed(2)
-                  }
-                  changeEvent={handleCalcCHI}
+                  value={calcCHI}
+                  changeEvent={() => handleCalcCHI}
                 />
               </div>
 
@@ -974,23 +779,7 @@ const IndividualiosVeiklosMokesciuSkaiciuokle = ({
                 <label>Mokėtina VSDĮ suma:</label>
                 <Input
                   type='number'
-                  value={
-                    (
-                      Math.round(
-                        ((incomeReceived - expensesValue) * 0.9 * 0.1252 -
-                          paidSSI) *
-                          100
-                      ) / 100
-                    ).toFixed(2) > 9070.83
-                      ? 9070.83
-                      : (
-                          Math.round(
-                            ((incomeReceived - expensesValue) * 0.9 * 0.1252 -
-                              paidSSI) *
-                              100
-                          ) / 100
-                        ).toFixed(2)
-                  }
+                  value={payableSSI}
                   changeEvent={handlePayableSSI}
                 />
               </div>
@@ -999,23 +788,7 @@ const IndividualiosVeiklosMokesciuSkaiciuokle = ({
                 <label>Mokėtina PSDĮ suma:</label>
                 <Input
                   type='number'
-                  value={
-                    (
-                      Math.round(
-                        ((incomeReceived - expensesValue) * 0.9 * 0.0698 -
-                          paidCHI) *
-                          100
-                      ) / 100
-                    ).toFixed(2) < 703.56
-                      ? 703.56
-                      : (
-                          Math.round(
-                            ((incomeReceived - expensesValue) * 0.9 * 0.0698 -
-                              paidCHI) *
-                              100
-                          ) / 100
-                        ).toFixed(2)
-                  }
+                  value={payableCHI}
                   changeEvent={handlePayableCHI}
                 />
               </div>
@@ -1036,15 +809,13 @@ const IndividualiosVeiklosMokesciuSkaiciuokle = ({
                 </label>
                 <Input
                   type='number'
-                  value={(
-                    Math.round((incomeReceived - expensesValue) * 100) / 100
-                  ).toFixed(2)}
+                  value={taxableProfit}
                   changeEvent={handleIncomeReceivedChange}
                 />
               </div>
 
               <div>
-                <label>Apskaičiuota GPM suma (`${}`):</label>
+                <label>Apskaičiuota GPM suma ({procGPM}%):</label>
                 <Input
                   type='number'
                   value={calcPIT}
