@@ -12,7 +12,7 @@ export const StyledHeader = styled.header<IHeaderProps>`
         justify-content: initial;
     }
     @media (min-width: ${(props) => (props.layoutbreakpoint ? props.layoutbreakpoint : '768px')}) {
-        padding: 0 50px;
+        padding: 0 calc(50px - 3.25rem / 2 / 2);
         min-height: 6vh;
     }
 `;

@@ -7,6 +7,7 @@ export const StyledNav = styled.nav<INavigationProps>`
     display: flex;
     position: relative;
     align-items: center;
+    z-index: 99;
 
     i {
         display: flex;

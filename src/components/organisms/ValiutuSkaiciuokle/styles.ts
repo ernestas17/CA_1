@@ -1,7 +1,5 @@
 import styled from 'styled-components';
 
-// --- Valiutu skaiciuokle styles
-
 export const StyledWrapper = styled.div`
     display: flex;
     flex-direction: column;
