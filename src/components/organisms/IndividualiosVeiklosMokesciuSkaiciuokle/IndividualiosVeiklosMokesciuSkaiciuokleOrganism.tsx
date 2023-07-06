@@ -42,14 +42,14 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
 
     // Apmokestinamos pajamos
     const taxableIncome = (incomeReceived - expenses) * 0.9;
-    setTaxableIncome((Math.round(taxableIncome * 100) / 100).toFixed(2));
+    setTaxableIncome(Math.round(taxableIncome * 100) / 100);
     // Apskaiciuota VSD ir moketina VSD
 
     const taxRate = checkboxValue === 1 ? 0.1552 : 0.1252;
     const maxSSI = checkboxValue === 1 ? 11244.35 : 9070.83;
     const calculatedSSI = Math.round(taxableIncome * taxRate * 100) / 100;
     const finalSSI = Math.min(calculatedSSI, maxSSI);
-    setCalcSSI(finalSSI.toFixed(2));
+    setCalcSSI(finalSSI);
 
     const payableSsi =
       (Math.round(taxableIncome * taxRate - (paidSSI ? paidSSI : 0)) * 100) /
@@ -57,56 +57,47 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
     const finalPayableSSI = Math.min(payableSsi, maxSSI);
     console.log(paidSSI);
 
-    setPayableSSI(((Math.round(finalPayableSSI) * 100) / 100).toFixed(2));
+    setPayableSSI((Math.round(finalPayableSSI) * 100) / 100);
 
     // Apskaiciuota PSD ir moketina PSD
-    const calcCHI = (Math.round(taxableIncome * 0.0698 * 100) / 100).toFixed(2);
+    const calcCHI = Math.round(taxableIncome * 0.0698 * 100) / 100;
     // const finalCalcCHI =
-    if (calcCHI < 703.56) {
+    if (calcCHI === 0) {
+      setCalcCHI(0);
+    } else if (calcCHI < 703.56) {
       setCalcCHI(703.56);
     } else if (calcCHI > 5057.06) {
       setCalcCHI(5057.06);
     } else {
-      setCalcCHI((Math.round(calcCHI * 100) / 100).toFixed(2));
+      setCalcCHI(Math.round(calcCHI * 100) / 100);
     }
 
-    setCalcCHI((Math.round(calcCHI * 100) / 100).toFixed(2));
-
-    const finalpayableChi = calcCHI - (paidCHI ? paidCHI : 0);
-    setPayableCHI((Math.round(finalpayableChi * 100) / 100).toFixed(2));
+    // setCalcCHI((Math.round(calcCHI * 100) / 100);
 
     // Apmokestinamas pelnas
     const taxableProfit =
       radioValue === 0.3
-        ? (Math.round((incomeReceived - expenses) * 100) / 100).toFixed(2)
-        : (
-            Math.round(
-              (incomeReceived - expenses - payableSSI - payableCHI) * 100
-            ) / 100
-          ).toFixed(2);
+        ? Math.round((incomeReceived - expenses) * 100) / 100
+        : Math.round(
+            (incomeReceived - expenses - payableSSI - payableCHI) * 100
+          ) / 100;
     setTaxableProfit(taxableProfit);
     // Apskaiciuotas GPM
 
     if (taxableProfit <= 20000) {
       setCalcPIT(
-        (
-          Math.round((taxableProfit * 0.15 - taxableProfit * 0.1) * 100) / 100
-        ).toFixed(2)
+        Math.round((taxableProfit * 0.15 - taxableProfit * 0.1) * 100) / 100
       );
     } else if (taxableProfit > 20000 && taxableProfit < 35000) {
       setCalcPIT(
-        (
-          Math.round(
-            (taxableProfit * 0.15 -
-              taxableProfit * (0.1 - (2 / 300000) * (taxableProfit - 20000))) *
-              100
-          ) / 100
-        ).toFixed(2)
+        Math.round(
+          (taxableProfit * 0.15 -
+            taxableProfit * (0.1 - (2 / 300000) * (taxableProfit - 20000))) *
+            100
+        ) / 100
       );
     } else {
-      setCalcPIT(
-        (Math.round((taxableProfit * 0.15 - 0) * 100) / 100).toFixed(2)
-      );
+      setCalcPIT(Math.round((taxableProfit * 0.15 - 0) * 100) / 100);
     }
 
     setCheckboxValue(checkboxValue);
@@ -119,15 +110,19 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
     checkboxValue,
     taxableIncome,
     calcSSI,
-    calcCHI,
+
     payableSSI,
     payableCHI,
     taxableProfit,
     calcPIT,
   ]);
-  const procGPM = (
-    Math.round(((calcPIT * 100) / taxableProfit) * 100) / 100
-  ).toFixed(2);
+  useEffect(() => {
+    const finalpayableChi = calcCHI - (paidCHI ? paidCHI : 0);
+    setPayableCHI(Math.round(finalpayableChi * 100) / 100);
+  }, [calcCHI, paidCHI]);
+  const procGPM = taxableProfit
+    ? Math.round(((calcPIT * 100) / taxableProfit) * 100) / 100
+    : 0;
   const handleIncomeReceivedChange = (event: ChangeEvent<HTMLInputElement>) => {
     const inputValue = parseFloat(event.target.value);
     setIncomeReceived(inputValue);
@@ -323,7 +318,7 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
             theme={theme}
             identifier='taxable-income'
             type='number'
-            value={taxableIncome}
+            value={taxableIncome.toFixed(2)}
             changeEvent={handleIncomeReceivedChange}
           />
         </div>
