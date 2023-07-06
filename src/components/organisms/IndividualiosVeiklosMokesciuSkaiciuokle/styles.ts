@@ -13,7 +13,7 @@ export const StyledWrapper = styled.div`
   width: 100%;
 
   h1 {
-    font-size: 18px;
+    font-size: 19px;
   }
   @media (min-width: 1024px) {
     flex-direction: row;
@@ -25,10 +25,14 @@ export const StyledIputsWrapper = styled.div`
   display: flex;
   flex-direction: column;
 
-  margin-top: 3px;
-  div {
-    margin-top: 8px;
-  }
+  
+  h1 {
+    @media (min-width: 1160px) {
+      margin-top: 0px;
+
+    }
+   
+ 
 `;
 export const StyledRadiosWrapper = styled.div`
   display: flex;
@@ -63,7 +67,4 @@ export const StyledCheckbox = styled.div`
 export const StyledOutputsWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  div {
-    margin-top: 8px;
-  }
 `;

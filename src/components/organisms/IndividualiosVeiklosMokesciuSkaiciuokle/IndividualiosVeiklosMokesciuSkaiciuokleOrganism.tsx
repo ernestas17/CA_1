@@ -42,7 +42,7 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
 
     // Apmokestinamos pajamos
     const taxableIncome = (incomeReceived - expenses) * 0.9;
-    setTaxableIncome(Math.round(taxableIncome * 100) / 100);
+    setTaxableIncome(taxableIncome);
     // Apskaiciuota VSD ir moketina VSD
 
     const taxRate = checkboxValue === 1 ? 0.1552 : 0.1252;
@@ -50,12 +50,14 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
     const calculatedSSI = taxableIncome * taxRate;
     const finalSSI = Math.min(calculatedSSI, maxSSI);
     setCalcSSI(finalSSI);
+    console.log(finalSSI);
 
     const payableSsi = taxableIncome * taxRate - (paidSSI ? paidSSI : 0);
     const finalPayableSSI = Math.min(payableSsi, maxSSI);
     console.log(paidSSI);
 
-    setPayableSSI((Math.round(finalPayableSSI) * 100) / 100);
+    setPayableSSI(finalPayableSSI);
+    console.log(finalPayableSSI);
 
     // Apskaiciuota PSD ir moketina PSD
     const calcCHI = taxableIncome * 0.0698;
@@ -70,35 +72,26 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
       setCalcCHI(calcCHI);
     }
 
-    // setCalcCHI((Math.round(calcCHI * 100) / 100);
-
     // Apmokestinamas pelnas
     const taxableProfit =
       radioValue === 0.3
-        ? Math.round((incomeReceived - expenses) * 100) / 100
-        : Math.round(
-            (incomeReceived - expenses - payableSSI - payableCHI) * 100
-          ) / 100;
+        ? incomeReceived - expenses
+        : incomeReceived - expenses - payableSSI - payableCHI;
     setTaxableProfit(taxableProfit);
     // Apskaiciuotas GPM
 
     if (taxableProfit <= 20000) {
-      setCalcPIT(
-        Math.round((taxableProfit * 0.15 - taxableProfit * 0.1) * 100) / 100
-      );
+      setCalcPIT(taxableProfit * 0.15 - taxableProfit * 0.1);
     } else if (taxableProfit > 20000 && taxableProfit < 35000) {
       setCalcPIT(
-        Math.round(
-          (taxableProfit * 0.15 -
-            taxableProfit * (0.1 - (2 / 300000) * (taxableProfit - 20000))) *
-            100
-        ) / 100
+        taxableProfit * 0.15 -
+          taxableProfit * (0.1 - (2 / 300000) * (taxableProfit - 20000))
       );
     } else if (
       taxableProfit >= 35000 &&
       taxableProfit * (0.1 - (2 / 300000) * (taxableProfit - 20000)) <= 0
     ) {
-      setCalcPIT(Math.round((taxableProfit * 0.15 - 0) * 100) / 100);
+      setCalcPIT(taxableProfit * 0.15 - 0);
     }
 
     setCheckboxValue(checkboxValue);
@@ -122,9 +115,7 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
     setPayableCHI(finalpayableChi);
   }, [calcCHI, paidCHI]);
 
-  const procGPM = taxableProfit
-    ? Math.round(((calcPIT * 100) / taxableProfit) * 100) / 100
-    : 0;
+  const procGPM = taxableProfit ? (calcPIT * 100) / taxableProfit : 0;
   const handleIncomeReceivedChange = (event: ChangeEvent<HTMLInputElement>) => {
     const inputValue = parseFloat(event.target.value);
     setIncomeReceived(inputValue);
@@ -203,7 +194,6 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
   return (
     <StyledWrapper>
       <StyledIputsWrapper>
-        <br />
         <h1>Individualios veiklos sumų įvedimas:</h1>
         <StyledDivider></StyledDivider>
         <div>
@@ -307,7 +297,7 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
             theme={theme}
             identifier='income-received'
             type='number'
-            value={incomeReceived}
+            value={Math.round(incomeReceived * 100) / 100}
             onChange={handleIncomeReceivedChange}
           />
         </div>
@@ -320,7 +310,7 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
             theme={theme}
             identifier='taxable-income'
             type='number'
-            value={taxableIncome}
+            value={Math.round(taxableIncome * 100) / 100}
             changeEvent={handleIncomeReceivedChange}
           />
         </div>
@@ -332,7 +322,7 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
             theme={theme}
             identifier='calc-SSI'
             type='number'
-            value={calcSSI}
+            value={Math.round(calcSSI * 100) / 100}
             changeEvent={handleCalcSSI}
           />
         </div>
@@ -344,7 +334,7 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
             theme={theme}
             identifier='calc-CHI'
             type='number'
-            value={calcCHI}
+            value={Math.round(calcCHI * 100) / 100}
             changeEvent={() => handleCalcCHI}
           />
         </div>
@@ -356,7 +346,7 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
             theme={theme}
             identifier='payable-SSI'
             type='number'
-            value={payableSSI}
+            value={Math.round(payableSSI * 100) / 100}
             changeEvent={handlePayableSSI}
           />
         </div>
@@ -368,7 +358,7 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
             theme={theme}
             identifier='payable-CHI'
             type='number'
-            value={payableCHI}
+            value={Math.round(payableCHI * 100) / 100}
             changeEvent={handlePayableCHI}
           />
         </div>
@@ -396,19 +386,19 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
             theme={theme}
             identifier='taxable-profit'
             type='number'
-            value={taxableProfit}
+            value={Math.round(taxableProfit * 100) / 100}
             changeEvent={handleTaxableProfit}
           />
         </div>
         <div>
           <Label targetinput='calc-PIT' size='18px'>
-            Apskaičiuota GPM suma ({procGPM}%):
+            Apskaičiuota GPM suma ({procGPM.toFixed(2)}%):
           </Label>
           <Input
             theme={theme}
             identifier='calc-PIT'
             type='number'
-            value={calcPIT}
+            value={Math.round(calcPIT * 100) / 100}
             changeEvent={() => handleTaxableProfit}
           />
         </div>
