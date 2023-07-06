@@ -47,20 +47,18 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
 
     const taxRate = checkboxValue === 1 ? 0.1552 : 0.1252;
     const maxSSI = checkboxValue === 1 ? 11244.35 : 9070.83;
-    const calculatedSSI = Math.round(taxableIncome * taxRate * 100) / 100;
+    const calculatedSSI = taxableIncome * taxRate;
     const finalSSI = Math.min(calculatedSSI, maxSSI);
     setCalcSSI(finalSSI);
 
-    const payableSsi =
-      (Math.round(taxableIncome * taxRate - (paidSSI ? paidSSI : 0)) * 100) /
-      100;
+    const payableSsi = taxableIncome * taxRate - (paidSSI ? paidSSI : 0);
     const finalPayableSSI = Math.min(payableSsi, maxSSI);
     console.log(paidSSI);
 
     setPayableSSI((Math.round(finalPayableSSI) * 100) / 100);
 
     // Apskaiciuota PSD ir moketina PSD
-    const calcCHI = Math.round(taxableIncome * 0.0698 * 100) / 100;
+    const calcCHI = taxableIncome * 0.0698;
     // const finalCalcCHI =
     if (calcCHI === 0) {
       setCalcCHI(0);
@@ -69,7 +67,7 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
     } else if (calcCHI > 5057.06) {
       setCalcCHI(5057.06);
     } else {
-      setCalcCHI(Math.round(calcCHI * 100) / 100);
+      setCalcCHI(calcCHI);
     }
 
     // setCalcCHI((Math.round(calcCHI * 100) / 100);
@@ -96,7 +94,10 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
             100
         ) / 100
       );
-    } else {
+    } else if (
+      taxableProfit >= 35000 &&
+      taxableProfit * (0.1 - (2 / 300000) * (taxableProfit - 20000)) <= 0
+    ) {
       setCalcPIT(Math.round((taxableProfit * 0.15 - 0) * 100) / 100);
     }
 
@@ -110,16 +111,17 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
     checkboxValue,
     taxableIncome,
     calcSSI,
-
     payableSSI,
     payableCHI,
     taxableProfit,
     calcPIT,
   ]);
+
   useEffect(() => {
     const finalpayableChi = calcCHI - (paidCHI ? paidCHI : 0);
-    setPayableCHI(Math.round(finalpayableChi * 100) / 100);
+    setPayableCHI(finalpayableChi);
   }, [calcCHI, paidCHI]);
+
   const procGPM = taxableProfit
     ? Math.round(((calcPIT * 100) / taxableProfit) * 100) / 100
     : 0;
@@ -318,7 +320,7 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
             theme={theme}
             identifier='taxable-income'
             type='number'
-            value={taxableIncome.toFixed(2)}
+            value={taxableIncome}
             changeEvent={handleIncomeReceivedChange}
           />
         </div>
