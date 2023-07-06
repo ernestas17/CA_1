@@ -1,0 +1,2 @@
+import IndividualiosVeiklosMokesciuSkaiciuokleOrganism from './IndividualiosVeiklosMokesciuSkaiciuokleOrganism';
+export default IndividualiosVeiklosMokesciuSkaiciuokleOrganism;
