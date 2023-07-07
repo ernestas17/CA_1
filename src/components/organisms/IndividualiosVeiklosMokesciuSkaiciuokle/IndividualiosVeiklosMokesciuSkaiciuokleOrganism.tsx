@@ -119,8 +119,6 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
     setPayableCHI(finalpayableChi);
   }, [calcCHI, paidCHI]);
 
-  useEffect(() => {}, []);
-
   const procGPM = taxableProfit ? (calcPIT * 100) / taxableProfit : 0;
   const handleIncomeReceivedChange = (event: ChangeEvent<HTMLInputElement>) => {
     const inputValue = parseFloat(event.target.value);
