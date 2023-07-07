@@ -5,7 +5,6 @@ import { useLocation } from 'react-router-dom';
 import { LINK_LIST } from '../../shared/link_list';
 import { NAV_ALIGNMENT } from '../Navigation/Navigation';
 import { IColorTheme, currentTheme } from '../../shared/color_themes';
-// import { navBreakpoint, layoutHeightBreakpoint } from '../../shared/color_themes';
 
 export interface IHeaderProps {
     breakpoint: string;
@@ -13,13 +12,13 @@ export interface IHeaderProps {
     theme: IColorTheme;
 }
 
-const navigationBreakpoint = '1220px';
-const layoutHeightBreakpoint = '768px';
-
 const Header = () => {
     const location = useLocation();
     const { pathname } = location;
     const [url, setUrl] = useState<string | null>(null);
+
+    const navigationBreakpoint = '1220px';
+    const layoutHeightBreakpoint = '768px';
 
     useEffect(() => {
         setUrl(pathname);

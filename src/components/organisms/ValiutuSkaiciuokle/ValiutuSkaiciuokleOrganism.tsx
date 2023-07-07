@@ -75,10 +75,10 @@ const ValiutuSkaiciuokleOrganism = ({ theme }: IValiutuSkaiciuokleProps) => {
                     const inputCurrency = input.getAttribute('data-currency') as string;
 
                     const availableData = isToday
-                        ? parseFloat(currencyRates?.[inputCurrency])
-                        : parseFloat(currencyRates?.[currentDate]?.[inputCurrency]);
+                        ? currencyRates?.[inputCurrency]
+                        : currencyRates?.[currentDate as keyof ICurrency]?.[inputCurrency as keyof ICurrency];
 
-                    input.value = (availableData * targetInputValue).toFixed(decimalNumbers);
+                    input.value = ((availableData as number) * targetInputValue).toFixed(decimalNumbers);
                 }
             });
         },
@@ -199,14 +199,14 @@ const ValiutuSkaiciuokleOrganism = ({ theme }: IValiutuSkaiciuokleProps) => {
                                     </Label>
 
                                     <Select theme={theme} changeEvent={addNewCurrency} identifier='currencies' defaultvalue={'pasirinkite'}>
-                                        <option disabled key='pasirinkite' value='pasirinkite'>
+                                        <option key='pasirinkite' value='pasirinkite'>
                                             - Pasirinkite -
                                         </option>
                                         {availableCurrencies &&
                                             Object.keys(availableCurrencies).map((currency) => {
                                                 const currentCurrency = availableCurrencies[currency];
                                                 const { code, name } = currentCurrency;
-                                                if (currencyCode !== code) {
+                                                if (currencyCode !== code && !currencyInputList.includes(currency)) {
                                                     return (
                                                         <option key={code} value={code}>
                                                             {`${name} (${code})`}
