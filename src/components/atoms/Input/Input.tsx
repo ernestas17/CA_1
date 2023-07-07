@@ -47,7 +47,7 @@ const Input = ({
       onChange={changeEvent}
       type={type}
       theme={theme}
-      // checked={checked}
+      checked={checked}
     />
   );
 };
