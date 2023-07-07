@@ -213,12 +213,12 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
             <Input
               theme={theme}
               type='radio'
-              identifier='radio-0.3'
+              identifier='radio'
               value={0.3}
-              checked={radioValue === 0.3}
+              // checked={radioValue === 0.3}
               changeEvent={() => handleRadioValueChange(0.3)}
             />
-            <Label targetinput='radio-0.3' size='18px'>
+            <Label targetinput='radio' size='18px'>
               30% nuo pajamų
             </Label>
           </div>
@@ -226,12 +226,12 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
             <Input
               theme={theme}
               type='radio'
-              identifier='radio-0'
+              identifier='radio'
               value={0}
-              checked={radioValue === 0}
+              // checked={radioValue === 0}
               changeEvent={() => handleRadioValueChange(0)}
             />
-            <Label targetinput='radio-0' size='18px'>
+            <Label targetinput='radio' size='18px'>
               faktinės išlaidos
             </Label>
           </div>
