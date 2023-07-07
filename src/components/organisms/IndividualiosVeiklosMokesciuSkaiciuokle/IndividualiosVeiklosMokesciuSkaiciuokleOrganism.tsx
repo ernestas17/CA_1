@@ -12,6 +12,7 @@ import { IColorTheme } from '../../../shared/color_themes';
 
 import Input from '../../atoms/Input';
 import Label from '../../atoms/Label';
+import Select from '../../atoms/Select';
 
 interface IIndvVeiklosMokesciuSkaiciuokleProps {
   theme?: IColorTheme;
@@ -202,6 +203,14 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
       <StyledIputsWrapper>
         <h1>Individualios veiklos sumų įvedimas:</h1>
         <StyledDivider></StyledDivider>
+        <div>
+          <Label targetinput='date' size='18px'>
+            Skaičiuoti už
+          </Label>
+          <Select theme={theme} identifier='date'>
+            <option value='2023'>2023 m.</option>
+          </Select>
+        </div>
         <div>
           <Label targetinput='income-received' size='18px'>
             Gautos pajamos
