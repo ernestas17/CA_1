@@ -1,8 +1,9 @@
-import { ChangeEvent, useRef } from 'react';
+import { ChangeEvent } from 'react';
 import Input from '../../atoms/Input';
 import { IColorTheme } from '../../../shared/color_themes';
 import { StyledBottom, StyledDivider, StyledTop, StyledWrapper } from './styles';
 import Label from '../../atoms/Label';
+import { useState } from 'react';
 
 interface INumbers {
     [key: number]: string;
@@ -99,7 +100,7 @@ export interface ISumaZodziais {
 }
 
 const SumaZodziais = ({ theme }: ISumaZodziais) => {
-    const outputRef = useRef<HTMLDivElement>(null);
+    const [text, setText] = useState<string>('Įveskite skaičių!');
 
     const numberToText = (val: number) => {
         if (val == 0) return 'nulis';
@@ -227,9 +228,7 @@ const SumaZodziais = ({ theme }: ISumaZodziais) => {
         const element = e.target as HTMLInputElement;
         const value = parseFloat(element?.value);
 
-        const output = outputRef?.current;
-
-        if (output) output.innerText = numberToText(value);
+        setText(() => numberToText(value));
     };
 
     return (
@@ -242,9 +241,7 @@ const SumaZodziais = ({ theme }: ISumaZodziais) => {
             </StyledTop>
             <StyledDivider theme={theme} className='zodziai-divider'></StyledDivider>
             <StyledBottom theme={theme}>
-                <div ref={outputRef} className='output'>
-                    Įveskite skaičių!
-                </div>
+                <div className='output'>{text}</div>
             </StyledBottom>
         </StyledWrapper>
     );
