@@ -1,11 +1,12 @@
 import { IColorTheme } from "../../../shared/color_themes";
 import { StyledInput } from "./style";
-import React, { forwardRef, ChangeEventHandler } from "react";
+import { ChangeEventHandler, MutableRefObject } from "react";
 
 export interface IInputProps {
   type: "number" | "checkbox" | "date" | "radio" | "text";
   changeEvent?: ChangeEventHandler<HTMLInputElement>;
   identifier?: string;
+  innerRef?: MutableRefObject<HTMLInputElement> | MutableRefObject<undefined>;
   data?: IData;
   min?: string;
   max?: string;
@@ -19,40 +20,36 @@ interface IData {
   [key: string]: string;
 }
 
-const Input = forwardRef<HTMLInputElement, IInputProps>(
-  (
-    {
-      type,
-      changeEvent,
-      identifier,
-      data,
-      min,
-      max,
-      value,
-      disabled,
-      theme,
-      checked,
-    },
-    ref
-  ) => {
-    return (
-      <StyledInput
-        {...data}
-        disabled={disabled}
-        value={value === null || value === undefined ? "" : value}
-        min={min}
-        max={max}
-        ref={ref}
-        className={identifier}
-        id={identifier}
-        name={identifier}
-        onChange={changeEvent}
-        type={type}
-        theme={theme}
-        checked={checked}
-      />
-    );
-  }
-);
+const Input = ({
+  type,
+  changeEvent,
+  identifier,
+  innerRef,
+  data,
+  min,
+  max,
+  value,
+  disabled,
+  theme,
+  checked,
+}: IInputProps) => {
+  return (
+    <StyledInput
+      {...data}
+      disabled={disabled}
+      value={value}
+      min={min}
+      max={max}
+      ref={innerRef}
+      className={identifier}
+      id={identifier}
+      name={identifier}
+      onChange={changeEvent}
+      type={type}
+      theme={theme}
+      // checked={checked}
+    />
+  );
+};
 
 export default Input;
