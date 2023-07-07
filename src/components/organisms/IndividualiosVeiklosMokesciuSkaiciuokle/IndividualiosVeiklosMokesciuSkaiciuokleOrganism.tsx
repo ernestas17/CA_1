@@ -87,11 +87,15 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
         taxableProfit * 0.15 -
           taxableProfit * (0.1 - (2 / 300000) * (taxableProfit - 20000))
       );
-    } else if (
-      taxableProfit >= 35000 &&
-      taxableProfit * (0.1 - (2 / 300000) * (taxableProfit - 20000)) <= 0
-    ) {
-      setCalcPIT(taxableProfit * 0.15 - 0);
+    } else if (taxableProfit >= 35000) {
+      if (taxableProfit * (0.1 - (2 / 300000) * (taxableProfit - 20000)) <= 0) {
+        setCalcPIT(taxableProfit * 0.15 - 0);
+      } else {
+        setCalcPIT(
+          taxableProfit * 0.15 -
+            taxableProfit * (0.1 - (2 / 300000) * (taxableProfit - 20000))
+        );
+      }
     }
 
     setCheckboxValue(checkboxValue);
@@ -114,6 +118,8 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
     const finalpayableChi = calcCHI - (paidCHI ? paidCHI : 0);
     setPayableCHI(finalpayableChi);
   }, [calcCHI, paidCHI]);
+
+  useEffect(() => {}, []);
 
   const procGPM = taxableProfit ? (calcPIT * 100) / taxableProfit : 0;
   const handleIncomeReceivedChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -213,12 +219,12 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
             <Input
               theme={theme}
               type='radio'
-              identifier='radio-0.3'
+              identifier='radio'
               value={0.3}
-              checked={radioValue === 0.3}
+              // checked={radioValue === 0.3}
               changeEvent={() => handleRadioValueChange(0.3)}
             />
-            <Label targetinput='radio-0.3' size='18px'>
+            <Label targetinput='radio' size='18px'>
               30% nuo pajamų
             </Label>
           </div>
@@ -226,12 +232,12 @@ const IndividualiosVeiklosMokesciuSkaiciuokleOrganism = ({
             <Input
               theme={theme}
               type='radio'
-              identifier='radio-0'
+              identifier='radio'
               value={0}
-              checked={radioValue === 0}
+              // checked={radioValue === 0}
               changeEvent={() => handleRadioValueChange(0)}
             />
-            <Label targetinput='radio-0' size='18px'>
+            <Label targetinput='radio' size='18px'>
               faktinės išlaidos
             </Label>
           </div>
