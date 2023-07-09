@@ -5,7 +5,10 @@ import Label from "../../atoms/Label";
 import Select from "../../atoms/Select";
 import {
   StyledCheckbox,
+  StyledIputsWrapper,
+  StyledOutputsWrapper,
   StyledRadiosWrapper,
+  StyledWrapper,
 } from "../IndividualiosVeiklosMokesciuSkaiciuokle/styles";
 
 interface IAtlyginimoIrMokesciuSkaiciuokleOrganismProps {
@@ -17,8 +20,6 @@ const AtlyginimoIrMokesciuSkaiciuokleOrganism = ({
 }: IAtlyginimoIrMokesciuSkaiciuokleOrganismProps) => {
   const [years, setYears] = useState<string[]>(["2023"]);
   const [procent, setProcent] = useState<string[]>(["0%", "2.1%", "3%"]);
-
-  const [selectedSalaryOption, setSelectedSalaryOption] = useState("");
 
   const [onPaperIncome, setOnPaperIncome] = useState(0);
   const [salary, setSalary] = useState(0);
@@ -32,6 +33,20 @@ const AtlyginimoIrMokesciuSkaiciuokleOrganism = ({
   const [sodra, setSodra] = useState(0);
   const [JobsPrice, setJobsPrice] = useState(0);
 
+  const [selectedIncomeType, setSelectedIncomeType] =
+    useState("Ant popieriaus");
+  const [selectedSalaryOption, setSelectedSalaryOption] =
+    useState("OnPaperCheckbox");
+
+  const [selectedNpdCalculationOption, setSelectedNpdCalculationOption] =
+    useState("systemCalculation");
+
+  const [isPensionChecked, setIsPensionChecked] = useState(false);
+
+  const [sodraLabel, setSodraLabel] = useState(
+    "Sodra. Pensijų ir soc. draudimas 12.52 %"
+  );
+
   const handleMonthlyIncomeChange = (e: ChangeEvent<HTMLInputElement>) => {
     const monthlyIncomeValue = Number(e.target.value) || 0;
     setOnPaperIncome(monthlyIncomeValue);
@@ -40,8 +55,9 @@ const AtlyginimoIrMokesciuSkaiciuokleOrganism = ({
     if (monthlyIncomeValue < 840) npdValue = 625;
     else if (monthlyIncomeValue > 840 && monthlyIncomeValue < 1926)
       npdValue = 625 - 0.42 * (monthlyIncomeValue - 840);
-    else if (monthlyIncomeValue > 1926)
+    else if (monthlyIncomeValue > 1926 && monthlyIncomeValue < 2865)
       npdValue = 400 - 0.18 * (monthlyIncomeValue - 642);
+    else if (monthlyIncomeValue >= 2865) npdValue = 0;
 
     setNpd(() => parseFloat(npdValue.toFixed(2)));
 
@@ -69,7 +85,6 @@ const AtlyginimoIrMokesciuSkaiciuokleOrganism = ({
       monthlyIncomeValue -
       (incomeTaxValue + healthInsuranceValue + pensionInsuranceValue);
     setSalary(() => parseFloat(salaryValue.toFixed(2)));
-    console.log("Salary: " + salaryValue);
 
     const sodraValue = monthlyIncomeValue * 0.0177;
     setSodra(() => parseFloat(sodraValue.toFixed(2)));
@@ -82,165 +97,219 @@ const AtlyginimoIrMokesciuSkaiciuokleOrganism = ({
     setSelectedSalaryOption(e.target.id);
 
     if (e.target.id === "OnPaperCheckbox") {
-      setSalary(onPaperIncome);
-    } else if (e.target.id === "calculatedIncomeCheckbox") {
       const salaryValue =
         onPaperIncome - (incomeTax + healthInsurance + pensionInsurance);
-      setSalary(parseFloat(salaryValue.toFixed(2)));
+      setSalary(() => parseFloat(salaryValue.toFixed(2)));
+      setSelectedIncomeType("Ant popieriaus");
+    } else if (e.target.id === "calculatedIncomeCheckbox") {
+      setSalary(onPaperIncome);
+      setSelectedIncomeType("Į rankas");
     }
+
+    handleMonthlyIncomeChange({
+      target: { value: onPaperIncome.toString() },
+    } as ChangeEvent<HTMLInputElement>);
   };
 
   const handleNpdCalculationOptionChange = (
     e: ChangeEvent<HTMLInputElement>
   ) => {
+    setSelectedNpdCalculationOption(e.target.id);
     if (e.target.id === "systemCalculation") {
-      setNpd(0);
+      let npdValue = 0;
+
+      if (onPaperIncome < 840) npdValue = 625;
+      else if (onPaperIncome > 840 && onPaperIncome < 1926)
+        npdValue = 625 - 0.42 * (onPaperIncome - 840);
+      else if (onPaperIncome > 1926)
+        npdValue = 400 - 0.18 * (onPaperIncome - 642);
+
+      if (npd < 0) npdValue = 0;
+      setNpd(() => parseFloat(npdValue.toFixed(2)));
     } else {
-      const npdValue = npd || 0;
-      setNpd(npdValue);
+      setNpd(0);
     }
   };
 
   const handleNpdChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setNpd(Number(e.target.value));
+    const npdValue = Number(e.target.value);
+    setNpd(npdValue);
+
+    if (selectedNpdCalculationOption === "declareMyself") {
+      const incomeTaxValue = (onPaperIncome - npdValue) * 0.2;
+      setIncomeTax(() => parseFloat(incomeTaxValue.toFixed(2)));
+
+      const salaryValue =
+        onPaperIncome - (incomeTaxValue + healthInsurance + pensionInsurance);
+      setSalary(() => parseFloat(salaryValue.toFixed(2)));
+    }
   };
 
   const handlePensionCheckboxChange = (e: ChangeEvent<HTMLInputElement>) => {
-    // todo
+    setIsPensionChecked(e.target.checked);
   };
 
   const handleProcentChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    // todo
+    const selectedProcent = e.target.value;
+    let bonusRate = 0;
+
+    switch (selectedProcent) {
+      case "2.1%":
+        bonusRate = 0.021;
+        setSodraLabel("Sodra. Pensijų ir soc. draudimas 14.62 %");
+        break;
+      case "3%":
+        bonusRate = 0.03;
+        setSodraLabel("Sodra. Pensijų ir soc. draudimas 15.52 %");
+        break;
+      default:
+        bonusRate = 0;
+        setSodraLabel("Sodra. Pensijų ir soc. draudimas 12.52 %");
+    }
+
+    const basePensionInsuranceValue = onPaperIncome * 0.1252;
+
+    const bonusValue = onPaperIncome * bonusRate;
+
+    const newPensionInsuranceValue = basePensionInsuranceValue + bonusValue;
+
+    setPensionInsurance(() => parseFloat(newPensionInsuranceValue.toFixed(2)));
   };
 
   return (
-    <>
-      <div>
-        <Select defaultvalue={years[0]} theme={theme} identifier="years">
-          {years.map((num) => {
-            return (
-              <option key={"years" + num} value={num}>
-                {num}
-              </option>
-            );
-          })}
-        </Select>
-      </div>
-      <div>
-        <StyledRadiosWrapper>
-          <div>
-            <Label targetinput="salaryLabel" size="18px">
-              Atlyginimas
-            </Label>
-            <Label targetinput="onPaperLabel" size="18px">
-              "ant popieriaus"
-            </Label>
-            <Input
-              theme={theme}
-              type="radio"
-              identifier="OnPaperCheckbox"
-              changeEvent={handleSalaryOptionChange}
-              checked={selectedSalaryOption === "OnPaperCheckbox"}
-            />
-            <Label targetinput="monthlyIncomeLabel" size="18px">
-              "į rankas"
-            </Label>
-            <Input
-              theme={theme}
-              type="radio"
-              identifier="calculatedIncomeCheckbox"
-              checked={selectedSalaryOption === "calculatedIncomeCheckbox"}
-              changeEvent={handleSalaryOptionChange}
-            />
-          </div>
-        </StyledRadiosWrapper>
-      </div>
-      <div>
-        <Label targetinput="calculatedIncomeLabel" size="18px">
-          "Ant popieriaus"
-        </Label>
-        <Input
-          theme={theme}
-          identifier="calculatedIncome"
-          type="number"
-          value={Number(onPaperIncome)}
-          changeEvent={handleMonthlyIncomeChange}
-        />
-      </div>
-      <div>
-        <Label targetinput="NPDLabel" size="18px">
-          Kaip skaičiuoti NPD?
-        </Label>
-      </div>
-      <StyledRadiosWrapper>
+    <StyledWrapper>
+      <StyledIputsWrapper>
         <div>
-          <Label targetinput="systemCalculationLabel" size="18px">
-            paskaičiuos sistema
-          </Label>
-          <Input
-            theme={theme}
-            type="radio"
-            identifier="systemCalculation"
-            changeEvent={handleNpdCalculationOptionChange}
-          />
-          <Label targetinput="declareMyselfLabel" size="18px">
-            nurodysiu pats
-          </Label>
-          <Input
-            theme={theme}
-            type="radio"
-            identifier="declareMyself"
-            changeEvent={handleNpdCalculationOptionChange}
-          />
-        </div>
-      </StyledRadiosWrapper>
-      <div>
-        <Label targetinput="npdLabel" size="18px">
-          Taikomas NPD
-        </Label>
-        <Input
-          theme={theme}
-          identifier="npd"
-          type="number"
-          value={Number(npd)}
-          changeEvent={handleNpdChange}
-        />
-      </div>
-      <div>
-        <StyledCheckbox>
-          <Label targetinput="pensionLabel" size="18px">
-            Kaupiu pensijai papildomai
-          </Label>
-          <Input
-            theme={theme}
-            identifier="pensionCheckbox"
-            type="checkbox"
-            changeEvent={handlePensionCheckboxChange}
-          />
-        </StyledCheckbox>
-      </div>
-      <div>
-        <Label targetinput="procentLabel" size="18px">
-          Kiek %?
-        </Label>
-        <div>
-          <Select
-            defaultvalue={procent[0]}
-            theme={theme}
-            changeEvent={handleProcentChange}
-            identifier="procent"
-          >
-            {procent.map((num) => {
+          <Select defaultvalue={years[0]} theme={theme} identifier="years">
+            {years.map((num) => {
               return (
-                <option key={"procent" + num} value={num}>
+                <option key={"years" + num} value={num}>
                   {num}
                 </option>
               );
             })}
           </Select>
         </div>
-      </div>
-      <>
+        <div>
+          <StyledRadiosWrapper>
+            <div>
+              <Label targetinput="salaryLabel" size="18px">
+                Atlyginimas
+              </Label>
+              <Label targetinput="onPaperLabel" size="18px">
+                "ant popieriaus"
+              </Label>
+              <Input
+                theme={theme}
+                type="radio"
+                identifier="OnPaperCheckbox"
+                changeEvent={handleSalaryOptionChange}
+                checked={selectedSalaryOption === "OnPaperCheckbox"}
+              />
+              <Label targetinput="monthlyIncomeLabel" size="18px">
+                "į rankas"
+              </Label>
+              <Input
+                theme={theme}
+                type="radio"
+                identifier="calculatedIncomeCheckbox"
+                checked={selectedSalaryOption === "calculatedIncomeCheckbox"}
+                changeEvent={handleSalaryOptionChange}
+              />
+            </div>
+          </StyledRadiosWrapper>
+        </div>
+        <div>
+          <Label targetinput="calculatedIncomeLabel" size="18px">
+            {selectedIncomeType}
+          </Label>
+          <Input
+            theme={theme}
+            identifier="calculatedIncome"
+            type="number"
+            value={Number(onPaperIncome)}
+            changeEvent={handleMonthlyIncomeChange}
+          />
+        </div>
+        <div>
+          <Label targetinput="NPDLabel" size="18px">
+            Kaip skaičiuoti NPD?
+          </Label>
+        </div>
+        <StyledRadiosWrapper>
+          <div>
+            <Label targetinput="systemCalculationLabel" size="18px">
+              paskaičiuos sistema
+            </Label>
+            <Input
+              theme={theme}
+              type="radio"
+              identifier="systemCalculation"
+              changeEvent={handleNpdCalculationOptionChange}
+              checked={selectedNpdCalculationOption === "systemCalculation"}
+            />
+            <Label targetinput="declareMyselfLabel" size="18px">
+              nurodysiu pats
+            </Label>
+            <Input
+              theme={theme}
+              type="radio"
+              identifier="declareMyself"
+              changeEvent={handleNpdCalculationOptionChange}
+              checked={selectedNpdCalculationOption === "declareMyself"}
+            />
+          </div>
+        </StyledRadiosWrapper>
+        <div>
+          <Label targetinput="npdLabel" size="18px">
+            Taikomas NPD
+          </Label>
+          <Input
+            theme={theme}
+            identifier="npd"
+            type="number"
+            value={Number(npd)}
+            changeEvent={handleNpdChange}
+          />
+        </div>
+        <div>
+          <StyledCheckbox>
+            <Label targetinput="pensionLabel" size="18px">
+              Kaupiu pensijai papildomai
+            </Label>
+            <Input
+              theme={theme}
+              identifier="pensionCheckbox"
+              type="checkbox"
+              changeEvent={handlePensionCheckboxChange}
+            />
+          </StyledCheckbox>
+        </div>
+        {isPensionChecked && (
+          <div>
+            <Label targetinput="procentLabel" size="18px">
+              Kiek %?
+            </Label>
+            <div>
+              <Select
+                defaultvalue={procent[0]}
+                theme={theme}
+                changeEvent={handleProcentChange}
+                identifier="procent"
+              >
+                {procent.map((num) => {
+                  return (
+                    <option key={"procent" + num} value={num}>
+                      {num}
+                    </option>
+                  );
+                })}
+              </Select>
+            </div>
+          </div>
+        )}
+      </StyledIputsWrapper>
+      <StyledOutputsWrapper>
         <div>
           <Label targetinput="onPaperIncomeLabel" size="18px">
             Priskaičiuotas atlyginimas "ant popieriaus"
@@ -303,7 +372,7 @@ const AtlyginimoIrMokesciuSkaiciuokleOrganism = ({
         </div>
         <div>
           <Label targetinput="pensionInsuranceLabel" size="18px">
-            Sodra. Pensijų ir soc. draudimas 15.52 %
+            {sodraLabel}
           </Label>
           <Input
             theme={theme}
@@ -352,8 +421,8 @@ const AtlyginimoIrMokesciuSkaiciuokleOrganism = ({
             value={Number(JobsPrice)}
           />
         </div>
-      </>
-    </>
+      </StyledOutputsWrapper>
+    </StyledWrapper>
   );
 };
 export default AtlyginimoIrMokesciuSkaiciuokleOrganism;
