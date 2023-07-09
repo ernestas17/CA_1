@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { IPageProps } from "./types";
+import { IPageProps } from "../../Pages/types";
 
 export const StyledMain = styled.main<IPageProps>`
   padding: 35px 20px;
@@ -24,7 +24,6 @@ export const StyledSection = styled.section`
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  box-shadow: 0 15px 20px 3px lightgray;
 `;
 
 export const StyledSectionHeadingWrapper = styled.div`
@@ -45,7 +44,7 @@ export const StyledSectionContent = styled.div`
   border: 3px solid ${(props) => props.theme.background};
   border-top: none;
   width: 100%;
-  height: 100%;
+  padding-bottom: 20px;
   border-radius: 0 0 5px 5px;
-  min-height: 60vh;
+  min-height: 39vh;
 `;
