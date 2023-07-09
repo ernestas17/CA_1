@@ -1,9 +1,17 @@
+// import {
+//   StyledMain,
+//   StyledSection,
+//   StyledSectionHeadingWrapper,
+//   StyledSectionContent,
+// } from "./Pages/styles";
+
 import {
   StyledMain,
   StyledSection,
   StyledSectionHeadingWrapper,
   StyledSectionContent,
-} from "./Pages/styles";
+} from "./organisms/PVMSkaiciuokle/styles";
+
 import PVMSkaiciuokleOrganism from "./organisms/PVMSkaiciuokle/PVMSkaiciuokleOrganism";
 import { IPageProps } from "./Pages/types";
 
