@@ -1,10 +1,3 @@
-// import {
-//   StyledMain,
-//   StyledSection,
-//   StyledSectionHeadingWrapper,
-//   StyledSectionContent,
-// } from "./Pages/styles";
-
 import {
   StyledMain,
   StyledSection,

@@ -1,5 +1,4 @@
 import styled from "styled-components";
-//import { IPageProps } from "./types";
 import { IPageProps } from "../../Pages/types";
 
 export const StyledMain = styled.main<IPageProps>`
